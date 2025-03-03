@@ -20,6 +20,7 @@ The project is designed to:
   Documentation is built using MkDocs Material, including educational content, usage examples, and references to additional resources like Lightning-Hydra-Template and ml_ops_template.
 
 ## Repository Structure
+```bash
 Cookiecutter_machine_learning_template_library/ 
 ├── docs/ # Global documentation (MkDocs Material) 
 ├── hooks/ # Shared Cookiecutter hooks (optional; can also be per template) 
@@ -47,6 +48,7 @@ Cookiecutter_machine_learning_template_library/
 │ └── workflows/ # GitHub Actions CI/CD workflows for linting, testing, and docs building 
 ├── README.md # This file 
 └── requirements.txt # Global development dependencies
+```
 
 
 ## Getting Started
