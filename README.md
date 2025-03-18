@@ -8,25 +8,25 @@ A library of Cookiecutter templates for machine learning projects – designed t
 ## Overview
 
 The project is designed to:
-- **Offer Multiple Specialized Templates:**  
+- **Offer Multiple Specialized Templates:**
   Each template is tailored to a specific task (e.g., barebone, MNIST classification, object detection, cartpole reinforcement learning) to help you quickly get to a working project without extensive modifications.
-- **Leverage Cookiecutter Flexibility:**  
+- **Leverage Cookiecutter Flexibility:**
   Utilize Cookiecutter hooks (`pre_prompt.py`, `pre_gen_project.py`, `post_gen_project.py`) to allow users to include or exclude sections of the template based on project needs.
-- **Enhance Code Quality and Reproducibility:**  
+- **Enhance Code Quality and Reproducibility:**
   Integrate tools like pre-commit (with Ruff and Black), GitHub Actions for CI/CD, and unit tests to ensure the generated projects are reliable and maintainable.
-- **Streamline Experiment Management:**  
+- **Streamline Experiment Management:**
   Utilize PyTorch Lightning for streamlined training loops, Hydra for flexible configuration, and Weights & Biases (WandB) for logging, model registry, and artifact management.
-- **Provide Rich Documentation:**  
+- **Provide Rich Documentation:**
   Documentation is built using MkDocs Material, including educational content, usage examples, and references to additional resources like Lightning-Hydra-Template and ml_ops_template.
 
 ## Repository Structure
 ```
-Cookiecutter_machine_learning_template_library/ 
-├── docs/ # Global documentation (MkDocs Material) 
-├── hooks/ # Shared Cookiecutter hooks (optional; can also be per template) 
-├── templates/ # Collection of ML project templates 
-│ ├── barebone/ 
-│ │ ├── cookiecutter.json 
+Cookiecutter_machine_learning_template_library/
+├── docs/ # Global documentation (MkDocs Material)
+├── hooks/ # Shared Cookiecutter hooks (optional; can also be per template)
+├── templates/ # Collection of ML project templates
+│ ├── barebone/
+│ │ ├── cookiecutter.json
 │ │ ├── hooks/
 │ │ ├── {{ cookiecutter.repo_name }}/
 │ │ └── ... (other files)
@@ -42,11 +42,11 @@ Cookiecutter_machine_learning_template_library/
 │ └── cartpole_reinforcement_learning/
 │ └── ... (reinforcement learning scaffold)
 ├── tests/ # Integration tests for validating template generation
-├── tasks.py # Automation tasks (e.g., build, test, docs, environment setup) 
-├── .pre-commit-config.yaml # Pre-commit hook configuration (using Ruff, Black, etc.) 
+├── tasks.py # Automation tasks (e.g., build, test, docs, environment setup)
+├── .pre-commit-config.yaml # Pre-commit hook configuration (using Ruff, Black, etc.)
 ├── .github/
-│ └── workflows/ # GitHub Actions CI/CD workflows for linting, testing, and docs building 
-├── README.md # This file 
+│ └── workflows/ # GitHub Actions CI/CD workflows for linting, testing, and docs building
+├── README.md # This file
 └── requirements.txt # Global development dependencies
 ```
 
@@ -55,7 +55,7 @@ Cookiecutter_machine_learning_template_library/
 
 ### Prerequisites
 
-- **Cookiecutter:**  
+- **Cookiecutter:**
   Install Cookiecutter if you haven’t already:
   ```bash
   pip install cookiecutter
@@ -73,7 +73,7 @@ We use Conda for environment management. You can also use alternatives like Poet
 Generating a New Project
 You can generate a project from a specific template using Cookiecutter’s --directory flag. For example, to generate a barebone project:
 ```bash
-cookiecutter https://github.com/your_username/Cookiecutter_machine_learning_template_library.git --directory=templates/barebone
+cookiecutter https://github.com/MoustHolmes/Cookiecutter_machine_learning_template_library.git --directory=templates/barebone
 ```
 Replace templates/barebone with the directory of your desired template.
 
@@ -100,4 +100,3 @@ Cookiecutter Documentation
 PyTorch Lightning
 Hydra
 Weights & Biases
-

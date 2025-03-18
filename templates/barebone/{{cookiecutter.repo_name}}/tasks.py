@@ -6,7 +6,9 @@ from invoke import task
 @task
 def create_environment(c):
     """Create a new conda environment for project."""
-    c.run("conda create -n {{ cookiecutter.repo_name }} python={{ cookiecutter.python_version }}")
+    c.run(
+        "conda create -n {{ cookiecutter.repo_name }} python={{ cookiecutter.python_version }}"
+    )
     c.run("conda activate {{ cookiecutter.repo_name }}")
     c.run("pip install -e .")
 

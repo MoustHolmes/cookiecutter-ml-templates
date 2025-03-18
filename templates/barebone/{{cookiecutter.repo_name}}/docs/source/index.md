@@ -10,13 +10,13 @@ This project follows the ML Ops template structure for maintainable and reproduc
 
 ```
 ├── configs/          # Hydra configuration files
-├── data/            
+├── data/
 │   ├── processed/   # Processed data
 │   └── raw/         # Raw data
 ├── docs/            # Documentation
 ├── notebooks/       # Jupyter notebooks
 ├── reports/         # Generated reports and figures
-│   └── figures/     
+│   └── figures/
 ├── src/             # Source code
 │   └── {{ cookiecutter.project_name }}/
 ├── tests/           # Unit tests
