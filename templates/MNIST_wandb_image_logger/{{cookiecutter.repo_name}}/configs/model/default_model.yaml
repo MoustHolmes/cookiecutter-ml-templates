@@ -1,0 +1,4 @@
+_target_: {{cookiecutter.project_name}}.barebones_lightningmodule.BarebonesLightningModule
+
+hidden_size: 64
+learning_rate: 1e-3

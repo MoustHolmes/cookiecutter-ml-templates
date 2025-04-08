@@ -1,0 +1,11 @@
+defaults:
+  - paths_config
+  - model: default_model
+  - data: default_data_module
+  - trainer: default_trainer
+  - callbacks: default_callbacks
+  - logger: wandb_logger
+  - _self_
+
+task_name: default
+profiling: false

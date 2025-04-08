@@ -1,0 +1,43 @@
+# @package _global_
+
+defaults:
+  - override /paths_config
+  - override /trainer: default_trainer
+  - override /model: default_model
+  - override /data: default_data_module
+  - _self_
+
+task_name: "debug"
+
+# disable logger and callbacks for debugging
+logger: null
+callbacks: null
+
+# paths configuration
+data_dir: ${hydra:runtime.cwd}/data/
+output_dir: ${hydra:runtime.cwd}/outputs/${task_name}
+
+extras:
+  ignore_warnings: False
+  enforce_tags: False
+
+# sets level of all command line loggers to 'DEBUG'
+hydra:
+  job_logging:
+    root:
+      level: DEBUG
+  # verbose: True  # uncomment to set hydra loggers to DEBUG
+
+trainer:
+  max_epochs: 1
+  accelerator: cpu  # debuggers don't like gpus
+  devices: 1  # debuggers don't like multiprocessing
+  detect_anomaly: true  # raise exception if NaN or +/-inf is detected
+  fast_dev_run: true  # runs 1 train, val, and test batch
+  enable_checkpointing: false  # disable checkpointing for faster runs
+  enable_model_summary: true  # still useful to see model structure
+  enable_progress_bar: true  # keep progress bar for visibility
+
+data:
+  num_workers: 0  # debuggers don't like multiprocessing
+  batch_size: 32  # smaller batch size for quicker iteration
