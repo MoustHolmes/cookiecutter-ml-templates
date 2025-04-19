@@ -1,102 +1,90 @@
-# cookiecutter-ml-templates
-Cookiecutter-based templates for reproducible ML research and rapid prototyping.
-
 # Cookiecutter Machine Learning Template Library
 
-A library of Cookiecutter templates for machine learning projects – designed to promote clean, reproducible, and modular research workflows. This repository provides a collection of specialized templates for various ML use cases such as classification, regression, object detection, and reinforcement learning. It’s aimed at both improving your own workflow and serving as a collaborative resource for the community.
+[![Documentation Status](https://readthedocs.org/projects/your-docs-slug/badge/?version=latest)](https://your-docs-slug.readthedocs.io/en/latest/?badge=latest) [![Build Status](https://github.com/YourUsername/YourRepoName/actions/workflows/ci.yml/badge.svg)](https://github.com/YourUsername/YourRepoName/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Overview
+A curated collection of Cookiecutter templates designed to jumpstart Machine Learning projects with a focus on PyTorch, PyTorch Lightning, Hydra, and MLOps best practices.
 
-The project is designed to:
-- **Offer Multiple Specialized Templates:**
-  Each template is tailored to a specific task (e.g., barebone, MNIST classification, object detection, cartpole reinforcement learning) to help you quickly get to a working project without extensive modifications.
-- **Leverage Cookiecutter Flexibility:**
-  Utilize Cookiecutter hooks (`pre_prompt.py`, `pre_gen_project.py`, `post_gen_project.py`) to allow users to include or exclude sections of the template based on project needs.
-- **Enhance Code Quality and Reproducibility:**
-  Integrate tools like pre-commit (with Ruff and Black), GitHub Actions for CI/CD, and unit tests to ensure the generated projects are reliable and maintainable.
-- **Streamline Experiment Management:**
-  Utilize PyTorch Lightning for streamlined training loops, Hydra for flexible configuration, and Weights & Biases (WandB) for logging, model registry, and artifact management.
-- **Provide Rich Documentation:**
-  Documentation is built using MkDocs Material, including educational content, usage examples, and references to additional resources like Lightning-Hydra-Template and ml_ops_template.
+## Motivation
+
+Developing Machine Learning models often involves repetitive setup and boilerplate code. Existing projects on platforms like GitHub can be outdated, poorly documented, or overly simplistic. This library aims to solve these issues by providing:
+
+* **Reusable Foundations:** Clean, well-structured templates that capture best practices learned from real projects.
+* **Standardization:** A consistent structure across different ML task types (classification, regression, RL, etc.).
+* **Educational Resource:** Clear examples and documentation explaining *why* certain choices were made and how to use the included tools effectively.
+* **Bridging the Gap:** Moving beyond simple code snippets to provide robust starting points for complex projects.
+* **Ease of Sharing:** A way to package and share successful project structures and patterns.
+
+## Core Principles
+
+1.  **Best Practices:** Adherence to modern MLOps principles, including robust configuration management, code formatting, testing, and versioning.
+2.  **Educational:** Templates and documentation designed to be learning resources, explaining the tools and techniques used.
+3.  **Modular:** Clear separation of concerns (e.g., data loading, model definition, training loop, configuration) to enhance readability, maintainability, and debuggability. Enables easy toggling of features and backtracking to simpler states.
+
+## Features
+
+* **Multiple Specialized Templates:** Start closer to your specific goal (e.g., image classification, regression, RL) rather than adapting a generic template.
+* **Cookiecutter Driven:** Flexible project generation allowing users to choose components and configure settings upfront. No runtime dependency on Cookiecutter after project creation.
+* **Modern Tech Stack:** Built upon PyTorch, PyTorch Lightning (for structure and features like Callbacks, distributed training), and Hydra (for powerful configuration).
+* **Developer Experience:** Integrates standard tooling like Ruff, Black, pre-commit, Pytest, and Invoke for code quality, consistency, and task automation.
+* **Comprehensive Documentation:** Using MkDocs Material for clear, searchable, and extensive documentation beyond simple API references.
+* **MLOps Integrations (Planned/Included):**
+    * Logging: Weights & Biases (W&B) integration, including Model Registry and Artifacts for datasets/predictions.
+    * Launchers: Support for local execution, Docker, and planned integration with cloud platforms (GCP Vertex AI) and potentially cluster schedulers (SLURM).
+    * Testing: Robust unit and integration testing structure within each template.
+
+## Technology Stack
+
+* Templating: [Cookiecutter](https://cookiecutter.readthedocs.io/en/stable/)
+* ML Framework: [PyTorch](https://pytorch.org/)
+* High-Level ML Library: [PyTorch Lightning](https://lightning.ai/pytorch-lightning)
+* Configuration Management: [Hydra](https://hydra.cc/)
+* Linting/Formatting: [Ruff](https://docs.astral.sh/ruff/), [Black](https://github.com/psf/black)
+* Pre-commit Hooks: [pre-commit](https://pre-commit.com/)
+* Testing: [Pytest](https://docs.pytest.org/)
+* Task Runner: [Invoke](https://www.pyinvoke.org/)
+* Documentation: [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/)
+* Environment Management: [Conda](https://docs.conda.io/) (Recommended, potentially with `uv` support later)
 
 ## Repository Structure
+
+This repository uses a mono-repo structure containing multiple independent Cookiecutter templates:
+
 ```
 Cookiecutter_machine_learning_template_library/
-├── docs/ # Global documentation (MkDocs Material)
-├── hooks/ # Shared Cookiecutter hooks (optional; can also be per template)
-├── templates/ # Collection of ML project templates
-│ ├── barebone/
-│ │ ├── cookiecutter.json
-│ │ ├── hooks/
-│ │ ├── {{ cookiecutter.repo_name }}/
-│ │ └── ... (other files)
-│ ├── barebone_classification/
-│ │ ├── cookiecutter.json
-│ │ └── ... (classification-specific scaffold)
-│ ├── mnist_classification/
-│ │ └── ... (MNIST demo project)
-│ ├── barebone_regression/
-│ │ └── ... (regression template)
-│ ├── starfish_object_detection/
-│ │ └── ... (object detection scaffold)
-│ └── cartpole_reinforcement_learning/
-│ └── ... (reinforcement learning scaffold)
-├── tests/ # Integration tests for validating template generation
-├── tasks.py # Automation tasks (e.g., build, test, docs, environment setup)
-├── .pre-commit-config.yaml # Pre-commit hook configuration (using Ruff, Black, etc.)
-├── .github/
-│ └── workflows/ # GitHub Actions CI/CD workflows for linting, testing, and docs building
-├── README.md # This file
-└── requirements.txt # Global development dependencies
+├── docs/             # Global documentation source (MkDocs)
+├── hooks/            # Shared Cookiecutter hooks (optional)
+├── templates/        # Collection of ML project templates
+│   ├── barebone/     # Minimalistic template
+│   ├── barebone_classification/
+│   └── ...           # Other specialized templates (regression, RL, etc.)
+├── tests/            # Tests for template generation validation
+├── tasks.py          # Invoke tasks for automation
+├── .pre-commit-config.yaml
+├── .github/workflows/ # CI/CD pipelines
+├── README.md         # This file
+└── requirements.txt  # Dev dependencies for the meta-repo
 ```
+## Available Templates (Initial)
 
+* `templates/barebone`: A minimal starting point with the core structure.
+* `templates/barebone_classification`: Barebone template configured for a classification task.
+* *(Planned)* `mnist_classification`: A full example for MNIST classification.
+* *(Planned)* `barebone_regression`: Barebone template for regression.
+* *(Planned)* Other templates for Object Detection, Reinforcement Learning, LLM Finetuning, Diffusion Models, etc.
 
 ## Getting Started
 
-### Prerequisites
+To use a template, install Cookiecutter and point it to this repository, specifying the desired template directory:
 
-- **Cookiecutter:**
-  Install Cookiecutter if you haven’t already:
-  ```bash
-  pip install cookiecutter
-  ```
-- Pre-commit:
-To ensure code quality, install pre-commit:
 ```bash
-  pip install pre-commit
-  pre-commit install
-```
+pip install cookiecutter
 
-- Conda (optional):
-We use Conda for environment management. You can also use alternatives like Poetry if preferred.
+# Example: Use the barebone classification template
+# Remember to replace YourUsername/YourRepoName with the actual repository path
+cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/barebone
 
-Generating a New Project
-You can generate a project from a specific template using Cookiecutter’s --directory flag. For example, to generate a barebone project:
-```bash
-cookiecutter https://github.com/MoustHolmes/Cookiecutter_machine_learning_template_library.git --directory=templates/barebone
-```
-Replace templates/barebone with the directory of your desired template.
+# Or use the full URL:
+# Remember to replace YourUsername/YourRepoName with the actual repository path
+cookiecutter https://github.com/MoustHolmes/cookiecutter-ml-templates --directory=templates/barebone
 
-- Templates
-Each template is designed for a specific use case:
-
-- barebone: Minimal scaffold for any ML project.
-- barebone_classification: Basic structure for classification tasks.
-- mnist_classification: A demo project for MNIST classification.
-- barebone_regression: Starter for regression projects.
-- starfish_object_detection: Scaffold for object detection projects.
-- cartpole_reinforcement_learning: Template for reinforcement learning experiments.
-
-Detailed documentation on each template is available in the docs folder.
-
-Contributing
-We welcome contributions! Whether you have a new template idea or improvements to existing ones, please check out our CONTRIBUTING.md for guidelines on how to get started.
-
-License
-This project is licensed under the MIT License – see the LICENSE file for details.
-
-Additional Resources
-Cookiecutter Documentation
-PyTorch Lightning
-Hydra
-Weights & Biases
+Follow the prompts to configure your new project.DocumentationFor detailed usage instructions, guides on the included tools, MLOps concepts, and contribution guidelines, please refer to the Full Documentation. ## ContributingContributions are welcome! Please read the Contributing Guidelines (to be created) and check the Issues page. ## LicenseThis project is licensed under the MIT License - see the LICENSE file for details. ## AcknowledgementsThis project draws inspiration from excellent existing templates and tools, including:[Lightning-Hydra-Template](https://github.com/ashleve/lightning-hydra-template)[mlops_template](https://github.com/SkafteNicki/mlops_template )

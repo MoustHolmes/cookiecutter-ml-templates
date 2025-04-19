@@ -222,3 +222,46 @@ def test_project_structure(temp_dir: Path) -> None:
     assert (generated_dir / "requirements.txt").exists()
     assert (generated_dir / "requirements_dev.txt").exists()
     assert (generated_dir / "tasks.py").exists()
+
+
+def test_mnist_wandb_image_logger_template_success(temp_dir: Path) -> None:
+    """Test successful generation of MNIST_wandb_image_logger template.
+
+    Args:
+        temp_dir: temporary directory for test
+    """
+    output_dir = temp_dir / "mnist_wandb_test"
+    current_dir = Path(__file__).parent
+    template_dir = (current_dir / ".." / "templates" / "MNIST_wandb_image_logger").resolve()
+
+    # Generate project
+    cookiecutter(
+        template=str(template_dir),
+        output_dir=str(output_dir),
+        no_input=True,
+        extra_context={
+            "project_name": "test_mnist_wandb",
+            "author_name": "Test Author",
+            "description": "Test MNIST WandB Image Logger",
+            "python_version": "3.12",
+            "open_source_license": "MIT",
+        },
+    )
+
+    # Check if critical files and directories exist
+    generated_dir = output_dir / "test_mnist_wandb"
+    assert generated_dir.exists()
+    assert (generated_dir / "src").exists()
+    assert (generated_dir / "tests").exists()
+    assert (generated_dir / "configs").exists()
+    assert (generated_dir / "data").exists()
+    assert (generated_dir / "docs").exists()
+    assert (generated_dir / "notebooks").exists()
+    assert (generated_dir / "logs").exists()
+    assert (generated_dir / "outputs").exists()
+    assert (generated_dir / "LICENSE").exists()
+    assert (generated_dir / "pyproject.toml").exists()
+    assert (generated_dir / "README.md").exists()
+    assert (generated_dir / "requirements.txt").exists()
+    assert (generated_dir / "requirements_dev.txt").exists()
+    assert (generated_dir / "tasks.py").exists()

@@ -1,6 +1,6 @@
-# wandb_logger
+# {{cookiecutter.project_name}}
 
-WandB logging development for ML templates
+{{cookiecutter.description}}
 
 ## Overview
 

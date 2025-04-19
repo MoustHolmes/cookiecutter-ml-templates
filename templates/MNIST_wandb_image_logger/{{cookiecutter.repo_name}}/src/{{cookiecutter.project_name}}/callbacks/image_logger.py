@@ -37,7 +37,7 @@ class ImageLoggerCallback(L.Callback):
             # Get images and predictions
             images, targets = batch
             images = images[:self.num_samples]
-            
+
             # Get model predictions
             with torch.no_grad():
                 logits = pl_module(images)
@@ -46,13 +46,13 @@ class ImageLoggerCallback(L.Callback):
             # Convert images to format suitable for logging
             images = self.denormalize(images)
             images_np = [img.permute(1, 2, 0).cpu().numpy() for img in images]  # Convert to (H, W, C) format
-            
+
             # Create a list of wandb Image objects with predictions as captions
             image_list = [
                 wandb.Image(img, caption=f"Pred: {pred.item()}, True: {target.item()}")
                 for img, pred, target in zip(images_np, preds, targets[:self.num_samples])
             ]
-            
+
             # Log to wandb
             trainer.logger.experiment.log(
                 {

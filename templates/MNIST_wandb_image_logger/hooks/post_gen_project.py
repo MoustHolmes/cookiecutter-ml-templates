@@ -5,8 +5,6 @@ from operator import ge, le
 
 project_name = "{{cookiecutter.project_name}}"
 python_version = "{{cookiecutter.python_version}}"
-use_wandb = "{{cookiecutter.use_wandb}}"
-include_examples = "{{cookiecutter.include_examples}}"
 
 # Project name validation
 if not project_name.isidentifier() or not project_name.islower():
@@ -29,13 +27,4 @@ if not (ge(python_version, min_version) and le(python_version, max_version)):
         f"Python version must be between {min_version} and {max_version}. "
         "These are the versions that still receive support."
     )
-    raise ValueError(msg)
-
-# Validate wandb and examples choices
-if use_wandb not in ["yes", "no"]:
-    msg = "use_wandb must be either 'yes' or 'no'"
-    raise ValueError(msg)
-
-if include_examples not in ["yes", "no"]:
-    msg = "include_examples must be either 'yes' or 'no'"
     raise ValueError(msg)
