@@ -86,5 +86,14 @@ cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/bare
 # Or use the full URL:
 # Remember to replace YourUsername/YourRepoName with the actual repository path
 cookiecutter https://github.com/MoustHolmes/cookiecutter-ml-templates --directory=templates/barebone
-
-Follow the prompts to configure your new project.DocumentationFor detailed usage instructions, guides on the included tools, MLOps concepts, and contribution guidelines, please refer to the Full Documentation. ## ContributingContributions are welcome! Please read the Contributing Guidelines (to be created) and check the Issues page. ## LicenseThis project is licensed under the MIT License - see the LICENSE file for details. ## AcknowledgementsThis project draws inspiration from excellent existing templates and tools, including:[Lightning-Hydra-Template](https://github.com/ashleve/lightning-hydra-template)[mlops_template](https://github.com/SkafteNicki/mlops_template )
+```
+Follow the prompts to configure your new project.DocumentationFor detailed usage instructions, guides on the included tools, MLOps concepts, and contribution guidelines, please refer to the Full Documentation. 
+## Contributing
+Contributions are welcome! Please read the Contributing Guidelines (to be created) and check the Issues page. 
+## License
+This project is licensed under the MIT License - see the LICENSE file for details. 
+## Acknowledgements
+This project draws inspiration from excellent existing templates and tools, 
+including:
+[Lightning-Hydra-Template](https://github.com/ashleve/lightning-hydra-template)
+[mlops_template](https://github.com/SkafteNicki/mlops_template )
