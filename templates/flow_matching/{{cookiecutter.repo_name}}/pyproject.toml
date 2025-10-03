@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "{{cookiecutter.repo_name}}"
+version = "0.0.1"
+description = "{{cookiecutter.description}}"
+authors = [
+  { name = "{{cookiecutter.author_name}}", email = "{{cookiecutter.author_email}}" },
+]
+{% if cookiecutter.open_source_license != "No license file" -%}
+license = { file = "LICENSE" }
+{%- endif %}
+keywords = ["machine learning", "flow matching", "generative models"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+]
+readme = "README.md"
+requires-python = ">={{cookiecutter.python_version}}"
+dynamic = ["dependencies", "optional-dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.dynamic.optional-dependencies]
+dev = {file = ['requirements_dev.txt']}
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["I", "N", "E", "W"]
+ignore = ["N812", "N813"]  # Ignore rules about import casing conventions
+
+[tool.coverage.run]
+omit = ["tests/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = [
+    "--strict-markers",
+    "--doctest-modules",
+    "--color=yes",
+    "--import-mode=importlib",
+]
+pythonpath = ["src"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning",
+]
