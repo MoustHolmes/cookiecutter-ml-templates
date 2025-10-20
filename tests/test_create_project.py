@@ -467,3 +467,149 @@ def test_barebone_with_pip_deps_manager(temp_dir: Path) -> None:
     # Verify no uv run commands are present
     assert "uv run" not in tasks_content
     assert "pip install" in tasks_content
+
+
+# Integration tests that run the generated project's internal tests
+@pytest.mark.slow
+def test_barebone_template_internal_tests(temp_dir: Path) -> None:
+    """Test that the generated barebone template's internal tests pass.
+
+    This is an integration test that:
+    1. Generates a project from the template
+    2. Installs its dependencies
+    3. Runs the generated project's test suite
+
+    Args:
+        temp_dir: temporary directory for test
+    """
+    import subprocess
+
+    output_dir = temp_dir / "barebone_integration"
+    current_dir = Path(__file__).parent
+    template_dir = (current_dir / ".." / "templates" / "barebone").resolve()
+
+    # Generate project
+    cookiecutter(
+        template=str(template_dir),
+        output_dir=str(output_dir),
+        no_input=True,
+        extra_context={
+            "project_name": "test_barebone_internal",
+            "author_name": "Test Author",
+            "description": "Test Barebone Internal Tests",
+            "python_version": "3.12",
+            "deps_manager": "pip",
+        },
+    )
+
+    generated_dir = output_dir / "test_barebone_internal"
+    assert generated_dir.exists()
+
+    # Install dependencies (in editable mode with dev dependencies)
+    install_result = subprocess.run(
+        ["pip", "install", "-e", ".[dev]"],
+        cwd=generated_dir,
+        capture_output=True,
+        text=True,
+        timeout=300,  # 5 minute timeout for installation
+    )
+
+    # Check if installation succeeded
+    if install_result.returncode != 0:
+        pytest.fail(
+            f"Failed to install dependencies:\n"
+            f"stdout: {install_result.stdout}\n"
+            f"stderr: {install_result.stderr}"
+        )
+
+    # Run the generated project's tests
+    test_result = subprocess.run(
+        ["pytest", "tests/", "-v"],
+        cwd=generated_dir,
+        capture_output=True,
+        text=True,
+        timeout=120,  # 2 minute timeout for tests
+    )
+
+    # Check if tests passed
+    if test_result.returncode != 0:
+        pytest.fail(
+            f"Generated project's tests failed:\n"
+            f"stdout: {test_result.stdout}\n"
+            f"stderr: {test_result.stderr}"
+        )
+
+    # Assert that we actually ran some tests
+    assert "passed" in test_result.stdout.lower() or "passed" in test_result.stderr.lower()
+
+
+@pytest.mark.slow
+def test_flow_matching_template_internal_tests(temp_dir: Path) -> None:
+    """Test that the generated flow_matching template's internal tests pass.
+
+    This is an integration test that:
+    1. Generates a project from the template
+    2. Installs its dependencies
+    3. Runs the generated project's test suite
+
+    Args:
+        temp_dir: temporary directory for test
+    """
+    import subprocess
+
+    output_dir = temp_dir / "flow_matching_integration"
+    current_dir = Path(__file__).parent
+    template_dir = (current_dir / ".." / "templates" / "flow_matching").resolve()
+
+    # Generate project
+    cookiecutter(
+        template=str(template_dir),
+        output_dir=str(output_dir),
+        no_input=True,
+        extra_context={
+            "project_name": "test_flow_internal",
+            "author_name": "Test Author",
+            "description": "Test Flow Matching Internal Tests",
+            "python_version": "3.12",
+        },
+    )
+
+    generated_dir = output_dir / "test_flow_internal"
+    assert generated_dir.exists()
+
+    # Install dependencies (in editable mode with dev dependencies)
+    install_result = subprocess.run(
+        ["pip", "install", "-e", ".[dev]"],
+        cwd=generated_dir,
+        capture_output=True,
+        text=True,
+        timeout=300,  # 5 minute timeout for installation
+    )
+
+    # Check if installation succeeded
+    if install_result.returncode != 0:
+        pytest.fail(
+            f"Failed to install dependencies:\n"
+            f"stdout: {install_result.stdout}\n"
+            f"stderr: {install_result.stderr}"
+        )
+
+    # Run the generated project's tests
+    test_result = subprocess.run(
+        ["pytest", "tests/", "-v", "--tb=short"],
+        cwd=generated_dir,
+        capture_output=True,
+        text=True,
+        timeout=120,  # 2 minute timeout for tests
+    )
+
+    # Check if tests passed
+    if test_result.returncode != 0:
+        pytest.fail(
+            f"Generated project's tests failed:\n"
+            f"stdout: {test_result.stdout}\n"
+            f"stderr: {test_result.stderr}"
+        )
+
+    # Assert that we actually ran some tests
+    assert "passed" in test_result.stdout.lower() or "passed" in test_result.stderr.lower()
