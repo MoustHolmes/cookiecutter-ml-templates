@@ -1,4 +1,4 @@
-# {{ cookiecutter.project_name }}
+# {{ cookiecutter.repo_name }}
 
 {{ cookiecutter.description }}
 
@@ -18,7 +18,7 @@ This project follows the ML Ops template structure for maintainable and reproduc
 ├── reports/         # Generated reports and figures
 │   └── figures/
 ├── src/             # Source code
-│   └── {{ cookiecutter.project_name }}/
+│   └── {{ cookiecutter.repo_name }}/
 ├── tests/           # Unit tests
 └── tasks.py         # Automation tasks
 ```

@@ -8,7 +8,7 @@ A minimal, production-ready PyTorch Lightning template for training **Flow Match
 
 - 🎯 **Flow Matching & Classifier-Free Guidance**: State-of-the-art generative modeling
 - 🔧 **Modular Design**: Easy-to-swap components (models, networks, schedulers, samplers, solvers)
-- ⚙️ **Hydra Configuration**: Clean, composable configs for reproducible experiments  
+- ⚙️ **Hydra Configuration**: Clean, composable configs for reproducible experiments
 - 📊 **Experiment Tracking**: Built-in Weights & Biases integration
 - ✅ **Production Ready**: Type hints, comprehensive tests, and documentation
 - 🚀 **Quick Start**: Train on MNIST or 2D toy datasets out of the box

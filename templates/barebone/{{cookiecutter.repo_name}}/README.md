@@ -1,4 +1,4 @@
-# {{cookiecutter.project_name}}
+# {{cookiecutter.repo_name}}
 
 {{cookiecutter.description}}
 
@@ -23,7 +23,7 @@ A minimal, well-structured machine learning project template with emphasis on:
 ├── reports/         # Generated reports and figures
 │   └── figures/
 ├── src/             # Source code
-│   └── {{cookiecutter.project_name}}/
+│   └── {{cookiecutter.repo_name}}/
 ├── tests/           # Unit tests
 └── tasks.py         # Automation tasks
 ```

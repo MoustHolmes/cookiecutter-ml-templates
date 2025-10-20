@@ -1,4 +1,4 @@
-site_name: {{ cookiecutter.project_name }}
+site_name: {{ cookiecutter.repo_name }}
 site_description: {{ cookiecutter.description }}
 site_author: {{ cookiecutter.author_name }}
 

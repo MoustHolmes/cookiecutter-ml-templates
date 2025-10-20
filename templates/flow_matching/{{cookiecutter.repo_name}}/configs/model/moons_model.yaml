@@ -1,6 +1,6 @@
 _target_: {{cookiecutter.repo_name}}.models.flow_matching.FlowMatching
 
-model: 
+model:
   _target_: {{cookiecutter.repo_name}}.networks.mlp.MoonsNet
   input_dim: 2
   output_dim: 2

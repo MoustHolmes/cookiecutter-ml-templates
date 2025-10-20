@@ -11,7 +11,9 @@ class ProjectStructureGenerator:
     """
 
     def __init__(
-        self: "ProjectStructureGenerator", root_path: str, output_file: str = "PROJECT_STRUCTURE.md"
+        self: "ProjectStructureGenerator",
+        root_path: str,
+        output_file: str = "PROJECT_STRUCTURE.md",
     ) -> None:
         """Initialize the ProjectStructureGenerator.
 
@@ -86,9 +88,7 @@ class ProjectStructureGenerator:
             if fnmatch.fnmatch(path_str, pattern) or fnmatch.fnmatch(rel_path_str, pattern):
                 return True
             # Handle directory matching
-            if pattern.endswith("/") and (
-                rel_path_str.startswith(pattern) or path_str.startswith(pattern)
-            ):
+            if pattern.endswith("/") and (rel_path_str.startswith(pattern) or path_str.startswith(pattern)):
                 return True
 
         return False
@@ -116,7 +116,10 @@ class ProjectStructureGenerator:
             return {"classes": classes, "functions": functions}
 
     def _process_python_file(
-        self: "ProjectStructureGenerator", path: Path, prefix: str, output: list[str]
+        self: "ProjectStructureGenerator",
+        path: Path,
+        prefix: str,
+        output: list[str],
     ) -> None:
         """Process a Python file and append its analysis to the output."""
         analysis = self.parse_python_file(str(path))

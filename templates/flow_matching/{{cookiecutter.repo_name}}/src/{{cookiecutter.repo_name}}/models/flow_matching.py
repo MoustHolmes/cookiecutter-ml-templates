@@ -153,7 +153,7 @@ class FlowMatchingCFG(L.LightningModule):
         model: nn.Module,
         alpha_beta_scheduler: nn.Module = LinearScheduler(data_dim=4),
         sampler: nn.Module = GaussianSampler(target_shape=(1, 28, 28)),
-        ode_solver: nn.Module= EulerSolver(), 
+        ode_solver: nn.Module= EulerSolver(),
         num_classes: int = 10,
         cfg_prob: float = 0.1,
         guidance_scale: float = 3.0,
@@ -183,7 +183,7 @@ class FlowMatchingCFG(L.LightningModule):
 
         # Add 1 to num_classes to account for the null token used for unconditional training
         self.hparams.num_classes = num_classes + 1
-        
+
         # Provide sensible defaults for optimizer and scheduler
         self.hparams.optimizer = optimizer or partial(Adam, lr=1e-4)
         self.hparams.lr_scheduler = lr_scheduler or partial(ReduceLROnPlateau, patience=5, factor=0.2)
@@ -249,11 +249,11 @@ class FlowMatchingCFG(L.LightningModule):
         """Performs a guided forward pass for CFG."""
         # Create unconditional labels (null token)
         uncond_labels = torch.full_like(labels, self.hparams.num_classes - 1)
-        
+
         # Get both conditional and unconditional predictions
         pred_cond = self.model(x, t, labels)
         pred_uncond = self.model(x, t, uncond_labels)
-        
+
         # Apply classifier-free guidance formula
         return (1 + guidance_scale) * pred_cond - guidance_scale * pred_uncond
 
@@ -282,12 +282,7 @@ class FlowMatchingCFG(L.LightningModule):
 
         # Sample initial noise and solve the ODE with the guided model
         x0 = self.sampler(num_samples=len(labels), device=self.device)
-        
+
         # We pass the guided callable to the solver. The solver will internally call it like:
         # guided_model_callable(x, t, labels=labels)
         return self.ode_solver.solve(guided_model_callable, x0=x0, labels=labels, steps=steps)
-    
-
-
-
-

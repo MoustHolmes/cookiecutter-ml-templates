@@ -4,7 +4,7 @@ import pytest
 import torch
 from torch.utils.data import DataLoader
 
-from {{cookiecutter.project_name}}.barebones_datamodule import BarebonesDataModule
+from {{cookiecutter.repo_name}}.barebones_datamodule import BarebonesDataModule
 
 
 @pytest.fixture

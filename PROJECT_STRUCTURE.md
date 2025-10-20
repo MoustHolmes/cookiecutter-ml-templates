@@ -68,10 +68,10 @@
                 Functions:
                  • forward
                   Forward pass of the model.
-                  
+
                   Args:
                   x: Input tensor of shape (batch_size, 28, 28)
-                  
+
                   Returns:
                   torch.Tensor: Output tensor of shape (batch_size, 10)
 
@@ -224,10 +224,10 @@
                 Functions:
                  • forward
                   Forward pass of the model.
-                  
+
                   Args:
                   x: Input tensor of shape (batch_size, 28, 28)
-                  
+
                   Returns:
                   torch.Tensor: Output tensor of shape (batch_size, 10)
 
@@ -339,52 +339,52 @@
         Functions:
          • temp_dir
           Provide a temporary directory for tests.
-          
+
           Args:
           tmp_path: pytest fixture providing temporary directory
-          
+
           Returns:
           Path to temporary directory
 
          • test_barebone_template_success
           Test successful generation of barebone template.
-          
+
           Args:
           temp_dir: temporary directory for test
 
          • test_project_name_with_number_prefix
           Test that project name cannot start with a number.
-          
+
           Args:
           temp_dir: temporary directory for test
 
          • test_project_name_with_spaces
           Test that project name cannot contain spaces.
-          
+
           Args:
           temp_dir: temporary directory for test
 
          • test_project_name_with_special_chars
           Test that project name cannot contain special characters.
-          
+
           Args:
           temp_dir: temporary directory for test
 
          • test_invalid_python_version
           Test that invalid Python version is rejected.
-          
+
           Args:
           temp_dir: temporary directory for test
 
          • test_classification_template_success
           Test successful generation of classification template.
-          
+
           Args:
           temp_dir: temporary directory for test
 
          • test_project_structure
           Test that generated project has correct structure.
-          
+
           Args:
           temp_dir: temporary directory for test
 
@@ -392,7 +392,7 @@
       Classes:
        • ProjectStructureGenerator
         A class for generating a markdown representation of a project's structure.
-        
+
         with code analysis.
 
       Functions:
@@ -424,4 +424,3 @@
 
        • create_template
         Create a new project from a template.
-

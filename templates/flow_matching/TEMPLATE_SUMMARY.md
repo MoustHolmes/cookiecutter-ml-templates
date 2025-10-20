@@ -26,7 +26,7 @@ Complete source code structure with proper organization:
 ### Configuration Files
 All Hydra configs with template variables:
 - `configs/model/` - Model configurations (default_model.yaml, moons_model.yaml)
-- `configs/data/` - Data configurations  
+- `configs/data/` - Data configurations
 - `configs/experiment/` - Full experiment configs (debug.yaml, moons.yaml)
 - `configs/trainer/` - PyTorch Lightning trainer settings
 - `configs/logger/` - WandB logger configuration

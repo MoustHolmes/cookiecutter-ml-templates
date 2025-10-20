@@ -1,7 +1,7 @@
 import pytest
 import torch
 
-from {{cookiecutter.project_name}}.barebones_lightningmodule import BarebonesLightningModule
+from {{cookiecutter.repo_name}}.barebones_lightningmodule import BarebonesLightningModule
 
 
 @pytest.fixture

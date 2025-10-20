@@ -6,7 +6,7 @@ from {{cookiecutter.repo_name}}.modules.solvers import EulerSolver, RK4Solver
 
 __all__ = [
     "LinearScheduler",
-    "CosineScheduler", 
+    "CosineScheduler",
     "StableScheduler",
     "GaussianSampler",
     "UniformSampler",
