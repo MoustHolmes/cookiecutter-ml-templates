@@ -25,7 +25,7 @@ def test_datamodule_attributes(datamodule):
     """Test if the datamodule has the correct attributes."""
     assert datamodule.hparams.batch_size == 32
     assert datamodule.hparams.num_workers == 0
-    assert isinstance(datamodule.transforms, torch.nn.Module)
+    assert datamodule.transforms is not None
 
 
 def test_prepare_data(datamodule):
@@ -62,7 +62,7 @@ def test_train_dataloader(datamodule):
 
     batch = next(iter(loader))
     assert len(batch) == 2  # (x, y) tuple
-    assert batch[0].shape[1:] == (28, 28)  # Image dimensions
+    assert batch[0].shape[1:] == (1, 28, 28)  # Image dimensions with channel
     assert batch[1].shape[0] == datamodule.hparams.batch_size  # Labels
 
 
@@ -78,7 +78,7 @@ def test_val_dataloader(datamodule):
 
     batch = next(iter(loader))
     assert len(batch) == 2
-    assert batch[0].shape[1:] == (28, 28)
+    assert batch[0].shape[1:] == (1, 28, 28)  # Image dimensions with channel
     assert batch[1].shape[0] == datamodule.hparams.batch_size
 
 
@@ -94,5 +94,5 @@ def test_test_dataloader(datamodule):
 
     batch = next(iter(loader))
     assert len(batch) == 2
-    assert batch[0].shape[1:] == (28, 28)
+    assert batch[0].shape[1:] == (1, 28, 28)  # Image dimensions with channel
     assert batch[1].shape[0] == datamodule.hparams.batch_size

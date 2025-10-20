@@ -1,0 +1,4 @@
+_target_: {{cookiecutter.repo_name}}.barebones_lightningmodule.BarebonesLightningModule
+
+hidden_size: 64
+learning_rate: 0.001
