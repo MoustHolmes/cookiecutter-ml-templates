@@ -7,5 +7,6 @@
     "description": "A PyTorch Lightning template for Flow Matching models",
     "python_version": "3.11",
     "pytorch_lightning_version": "2.2.0",
-    "open_source_license": ["MIT", "BSD-3-Clause", "Apache-2.0", "No license file"]
+    "open_source_license": ["MIT", "BSD-3-Clause", "Apache-2.0", "No license file"],
+    "create_github_repo": ["no", "yes"]
 }

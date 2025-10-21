@@ -1,0 +1,10 @@
+{
+  "exclude": [
+    "**/{{cookiecutter.repo_name}}/**",
+    "templates/**/{{cookiecutter.repo_name}}/**",
+    "templates/**/*.py"
+  ],
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false,
+  "pythonVersion": "3.10"
+}

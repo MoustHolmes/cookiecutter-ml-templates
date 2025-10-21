@@ -2,6 +2,8 @@
 
 import os
 import shutil
+import subprocess
+import sys
 from keyword import iskeyword
 from operator import ge, le
 from pathlib import Path
@@ -10,6 +12,10 @@ project_name = "{{cookiecutter.project_name}}"
 python_version = "{{cookiecutter.python_version}}"
 project_structure = "{{cookiecutter.project_structure}}"
 deps_manager = "{{cookiecutter.deps_manager}}"
+create_github_repo = "{{cookiecutter.create_github_repo}}"
+github_username = "{{cookiecutter.github_username}}"
+repo_name = "{{cookiecutter.repo_name}}"
+description = "{{cookiecutter.description}}"
 
 # Project name validation
 if not project_name.isidentifier() or not project_name.islower():
@@ -102,3 +108,112 @@ if project_structure == "minimal":
 
         with tasks_file.open("w") as f:
             f.writelines(filtered_lines)
+
+
+# GitHub repository creation
+def create_github_repository():
+    """Create a GitHub repository using GitHub CLI."""
+    print("\n" + "=" * 80)
+    print("Creating GitHub repository...")
+    print("=" * 80)
+
+    # Check if gh CLI is installed
+    try:
+        subprocess.run(["gh", "--version"], capture_output=True, check=True)
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print("\n❌ GitHub CLI (gh) is not installed or not in PATH.")
+        print("\nTo install GitHub CLI:")
+        print("  macOS:   brew install gh")
+        print("  Linux:   See https://github.com/cli/cli/blob/trunk/docs/install_linux.md")
+        print("  Windows: See https://github.com/cli/cli#installation")
+        print("\nAfter installation, run: gh auth login")
+        return False
+
+    # Check if user is authenticated
+    try:
+        result = subprocess.run(
+            ["gh", "auth", "status"],
+            capture_output=True,
+            text=True,
+            check=False
+        )
+        if result.returncode != 0:
+            print("\n❌ Not authenticated with GitHub CLI.")
+            print("\nPlease run: gh auth login")
+            return False
+    except Exception as e:
+        print(f"\n❌ Error checking GitHub authentication: {e}")
+        return False
+
+    # Initialize git repository if not already initialized
+    if not Path(".git").exists():
+        print("\n📦 Initializing git repository...")
+        try:
+            subprocess.run(["git", "init"], check=True)
+            subprocess.run(["git", "add", "."], check=True)
+            subprocess.run(
+                ["git", "commit", "-m", "Initial commit from cookiecutter template"],
+                check=True
+            )
+            print("✅ Git repository initialized")
+        except subprocess.CalledProcessError as e:
+            print(f"\n❌ Error initializing git repository: {e}")
+            return False
+
+    # Create GitHub repository
+    print(f"\n🚀 Creating repository: {github_username}/{repo_name}")
+    try:
+        cmd = [
+            "gh", "repo", "create",
+            f"{github_username}/{repo_name}",
+            "--description", description,
+            "--public",
+            "--source", ".",
+            "--push"
+        ]
+        
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            check=False
+        )
+        
+        if result.returncode == 0:
+            print(f"\n✅ GitHub repository created successfully!")
+            print(f"🔗 Repository URL: https://github.com/{github_username}/{repo_name}")
+            print("\n📤 Initial commit has been pushed to GitHub")
+            return True
+        else:
+            print(f"\n❌ Error creating repository: {result.stderr}")
+            if "already exists" in result.stderr.lower():
+                print(f"\n💡 Repository {github_username}/{repo_name} already exists.")
+                print("   You can push to it manually with: git push")
+            return False
+            
+    except Exception as e:
+        print(f"\n❌ Unexpected error: {e}")
+        return False
+
+
+if create_github_repo == "yes":
+    try:
+        create_github_repository()
+    except Exception as e:
+        print(f"\n⚠️  Warning: Could not create GitHub repository: {e}")
+        print("You can create it manually later with: gh repo create")
+
+print("\n" + "=" * 80)
+print("✅ Project created successfully!")
+print("=" * 80)
+print(f"\n📁 Location: {Path.cwd()}")
+print("\n🔧 Next steps:")
+print("1. cd", repo_name)
+if deps_manager == "pip":
+    print("2. pip install -r requirements.txt")
+else:
+    print("2. uv pip install -r requirements.txt")
+print("3. pip install -e .")
+print("4. python src/" + repo_name + "/train.py  # Run training")
+print("\n📖 Documentation: See README.md for more details")
+print("=" * 80 + "\n")

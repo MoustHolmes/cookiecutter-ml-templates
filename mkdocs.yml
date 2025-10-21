@@ -1,0 +1,79 @@
+site_name: Cookiecutter ML Templates
+site_description: A curated collection of Cookiecutter templates for Machine Learning projects
+site_author: MoustHolmes
+repo_url: https://github.com/MoustHolmes/cookiecutter-ml-templates
+repo_name: MoustHolmes/cookiecutter-ml-templates
+
+theme:
+  name: material
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Quick Start: getting-started/quickstart.md
+      - Installation: getting-started/installation.md
+      - Your First Project: getting-started/first-project.md
+  - Templates:
+      - Overview: available-templates/overview.md
+      - Barebone: available-templates/barebone.md
+      - Flow Matching: available-templates/flow-matching.md
+      - MNIST W&B Logger: available-templates/mnist-wandb.md
+      - Classification: available-templates/classification.md
+  - Guides:
+      - Configuration with Hydra: guides/hydra-config.md
+      - Testing Strategy: guides/testing.md
+      - GitHub Integration: guides/github-integration.md
+      - Dependency Management: guides/dependency-management.md
+      - Project Structure: guides/project-structure.md
+  - Development:
+      - Contributing: development/contributing.md
+      - Testing Templates: development/testing-templates.md
+      - Creating New Templates: development/creating-templates.md
+  - Reference:
+      - Template Options: reference/template-options.md
+      - Best Practices: reference/best-practices.md
+      - FAQ: reference/faq.md
+
+plugins:
+  - search
+  - autorefs

@@ -6,5 +6,7 @@
     "python_version": "3.12",
     "open_source_license": ["No license file", "MIT", "BSD-3-Clause"],
     "project_structure": ["full", "minimal"],
-    "deps_manager": ["pip", "uv"]
+    "deps_manager": ["pip", "uv"],
+    "create_github_repo": ["no", "yes"],
+    "github_username": "{{ cookiecutter.author_name.lower().replace(' ', '') }}"
 }
