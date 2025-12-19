@@ -4,5 +4,6 @@
     "author_name": "Your name",
     "description": "A short description of the project.",
     "python_version": "3.12",
+    "deps_manager": ["pip", "uv"],
     "open_source_license": ["No license file", "MIT", "BSD-3-Clause"]
 }

@@ -4,7 +4,7 @@ import pytest
 import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from wandb_logger.barebones_datamodule import BarebonesDataModule
+from {{cookiecutter.repo_name}}.data.barebones_datamodule import BarebonesDataModule
 
 
 @pytest.fixture

@@ -10,7 +10,7 @@ class MoonsNet(nn.Module):
         super().__init__()
 
         # Time embedding - same style as UNet
-        from {{cookiecutter.repo_name}}.networks.unet import FourierEncoder
+        from {{cookiecutter.repo_name}}.models.unet import FourierEncoder
         self.time_mlp = nn.Sequential(
             FourierEncoder(time_dim),
             nn.Linear(time_dim, time_dim),

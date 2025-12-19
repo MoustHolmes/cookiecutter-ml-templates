@@ -17,7 +17,7 @@ Successfully created a cookiecutter template for PyTorch Lightning Flow Matching
 ### Architecture
 Complete source code structure with proper organization:
 - `models/` - LightningModules for training orchestration
-- `networks/` - Neural network architectures (U-Net, MLP)
+- `models/` - Neural network architectures (U-Net, MLP)
 - `modules/` - Reusable components (schedulers, samplers, solvers)
 - `data/` - LightningDataModules (MNIST, Moons datasets)
 - `callbacks/` - Custom training callbacks
@@ -137,14 +137,14 @@ pytest tests/ -v
 All Python imports use Jinja2 template syntax:
 ```python
 from {{cookiecutter.repo_name}}.models.flow_matching import FlowMatching
-from {{cookiecutter.repo_name}}.networks.unet import UNet
+from {{cookiecutter.repo_name}}.models.unet import UNet
 from {{cookiecutter.repo_name}}.modules.schedulers import LinearScheduler
 ```
 
 During generation, these become:
 ```python
 from test_flow_project.models.flow_matching import FlowMatching
-from test_flow_project.networks.unet import UNet
+from test_flow_project.models.unet import UNet
 from test_flow_project.modules.schedulers import LinearScheduler
 ```
 
@@ -153,7 +153,7 @@ Hydra configs use template syntax for `_target_` paths:
 ```yaml
 _target_: {{cookiecutter.repo_name}}.models.flow_matching.FlowMatching
 model:
-  _target_: {{cookiecutter.repo_name}}.networks.unet.UNet
+  _target_: {{cookiecutter.repo_name}}.models.unet.UNet
 ```
 
 ### Expected Linter Errors
@@ -177,7 +177,7 @@ flow_matching/
     ├── src/
     │   └── {{cookiecutter.repo_name}}/
     │       ├── models/             # FlowMatching, FlowMatchingCFG
-    │       ├── networks/           # UNet, MLP
+    │       ├── models/             # UNet, MLP
     │       ├── modules/            # Schedulers, samplers, solvers
     │       ├── data/               # DataModules
     │       ├── callbacks/          # Custom callbacks

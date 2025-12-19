@@ -1,10 +1,13 @@
-"""Post-generation script for classification template."""
+"""Post-generation script for MNIST_wandb_image_logger template."""
 
+import os
+from pathlib import Path
 from keyword import iskeyword
 from operator import ge, le
 
 project_name = "{{cookiecutter.project_name}}"
 python_version = "{{cookiecutter.python_version}}"
+deps_manager = "{{cookiecutter.deps_manager}}"
 
 # Project name validation
 if not project_name.isidentifier() or not project_name.islower():
@@ -28,3 +31,24 @@ if not (ge(python_version, min_version) and le(python_version, max_version)):
         "These are the versions that still receive support."
     )
     raise ValueError(msg)
+
+# Handle dependency manager option
+if deps_manager == "uv":
+    # Remove pip-specific files
+    for file in ["requirements.txt", "requirements_dev.txt", "tasks_pip.py"]:
+        if Path(file).exists():
+            os.remove(file)
+
+    # Rename uv tasks
+    if Path("tasks_uv.py").exists():
+        os.rename("tasks_uv.py", "tasks.py")
+
+elif deps_manager == "pip":
+    # Remove uv-specific files
+    if Path("tasks_uv.py").exists():
+        os.remove("tasks_uv.py")
+
+    # Rename pip tasks
+    if Path("tasks_pip.py").exists():
+        os.rename("tasks_pip.py", "tasks.py")
+

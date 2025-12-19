@@ -84,7 +84,7 @@ python src/{{cookiecutter.repo_name}}/train.py \
 │   ├── train.py               # Main training script
 │   ├── models/                # LightningModules (training logic)
 │   │   └── flow_matching.py  # FlowMatching & FlowMatchingCFG
-│   ├── networks/              # Neural network architectures
+│   ├── models/                # Neural network architectures
 │   │   ├── unet.py           # U-Net for images
 │   │   └── mlp.py            # MLP for 2D data
 │   ├── modules/               # Reusable building blocks
@@ -200,7 +200,7 @@ See `data/README.md` for detailed instructions.
 
 ### Adding a Custom Model
 
-1. Create your model in `src/{{cookiecutter.repo_name}}/networks/`
+1. Create your model in `src/{{cookiecutter.repo_name}}/models/`
 2. Create config in `configs/model/my_model.yaml`
 3. Use with: `python train.py model=my_model`
 

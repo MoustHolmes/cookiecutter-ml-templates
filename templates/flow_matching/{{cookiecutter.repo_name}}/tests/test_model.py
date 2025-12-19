@@ -3,8 +3,8 @@ import torch
 from functools import partial
 from torch.optim import Adam
 
-from {{cookiecutter.repo_name}}.networks.mlp import MoonsNet
-from {{cookiecutter.repo_name}}.models.flow_matching import FlowMatching, FlowMatchingCFG
+from {{cookiecutter.repo_name}}.models.mlp import MoonsNet
+from {{cookiecutter.repo_name}}.flow_matching_module import FlowMatching, FlowMatchingCFG
 from {{cookiecutter.repo_name}}.modules.samplers import GaussianSampler
 from {{cookiecutter.repo_name}}.modules.schedulers import LinearScheduler
 from {{cookiecutter.repo_name}}.modules.solvers import EulerSolver

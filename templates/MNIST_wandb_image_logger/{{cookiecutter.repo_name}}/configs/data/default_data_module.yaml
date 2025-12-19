@@ -1,4 +1,4 @@
-_target_: {{cookiecutter.project_name}}.barebones_datamodule.BarebonesDataModule
+_target_: {{cookiecutter.repo_name}}.data.barebones_datamodule.BarebonesDataModule
 
 data_dir: ${data_dir}
 batch_size: 128

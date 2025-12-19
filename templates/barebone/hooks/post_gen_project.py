@@ -45,27 +45,21 @@ if not (ge(python_version, min_version) and le(python_version, max_version)):
 # Handle dependency manager option
 if deps_manager == "uv":
     # Remove pip-specific files
-    for file in ["requirements.txt", "requirements_dev.txt", "pyproject_pip.toml", "tasks_pip.py"]:
+    for file in ["requirements.txt", "requirements_dev.txt", "tasks_pip.py"]:
         file_path = Path(file)
         if file_path.exists():
             os.remove(file_path)
 
-    # Rename uv files to default names
-    if Path("pyproject_uv.toml").exists():
-        os.rename("pyproject_uv.toml", "pyproject.toml")
+    # Rename uv tasks
     if Path("tasks_uv.py").exists():
         os.rename("tasks_uv.py", "tasks.py")
 
 elif deps_manager == "pip":
     # Remove uv-specific files
-    for file in ["pyproject_uv.toml", "tasks_uv.py"]:
-        file_path = Path(file)
-        if file_path.exists():
-            os.remove(file_path)
+    if Path("tasks_uv.py").exists():
+        os.remove("tasks_uv.py")
 
-    # Rename pip files to default names
-    if Path("pyproject_pip.toml").exists():
-        os.rename("pyproject_pip.toml", "pyproject.toml")
+    # Rename pip tasks
     if Path("tasks_pip.py").exists():
         os.rename("tasks_pip.py", "tasks.py")
 

@@ -10,6 +10,7 @@ create_github_repo = "{{cookiecutter.create_github_repo}}"
 github_username = "{{cookiecutter.github_username}}"
 repo_name = "{{cookiecutter.repo_name}}"
 description = "{{cookiecutter.description}}"
+deps_manager = "{{cookiecutter.deps_manager}}"
 
 
 def remove_file(filepath):
@@ -104,6 +105,26 @@ def create_github_repository():
 
 def main():
     """Execute the post-generation tasks."""
+    # Handle dependency manager option
+    if deps_manager == "uv":
+        # Remove pip-specific files
+        for file in ["requirements.txt", "requirements_dev.txt", "tasks_pip.py"]:
+            if Path(file).exists():
+                os.remove(file)
+
+        # Rename uv tasks
+        if Path("tasks_uv.py").exists():
+            os.rename("tasks_uv.py", "tasks.py")
+
+    elif deps_manager == "pip":
+        # Remove uv-specific files
+        if Path("tasks_uv.py").exists():
+            os.remove("tasks_uv.py")
+
+        # Rename pip tasks
+        if Path("tasks_pip.py").exists():
+            os.rename("tasks_pip.py", "tasks.py")
+
     if create_github_repo == "yes":
         try:
             create_github_repository()
@@ -116,10 +137,13 @@ def main():
     print("=" * 80)
     print(f"\n📁 Location: {PROJECT_DIRECTORY}")
     print("\n🔧 Next steps:")
-    print("1. cd {{cookiecutter.repo_name}}")
-    print("2. pip install -r requirements.txt")
+    print(f"1. cd {repo_name}")
+    if deps_manager == "pip":
+        print("2. pip install -r requirements.txt")
+    else:
+        print("2. uv pip install -r requirements.txt")
     print("3. pip install -e .")
-    print("4. python src/{{cookiecutter.repo_name}}/train.py experiment=moons  # Run training")
+    print(f"4. python src/{repo_name}/train.py experiment=moons  # Run training")
     print("\n📖 Documentation: See README.md for more details")
     print("=" * 80 + "\n")
 
