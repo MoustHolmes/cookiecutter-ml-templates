@@ -38,6 +38,8 @@ coverage.xml
 *.cover
 *.py,cover
 .pytest_cache/
+tests/__pycache__/
+*.pyc
 
 # ML-specific
 *.ckpt
