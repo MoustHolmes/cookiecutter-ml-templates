@@ -50,27 +50,31 @@ Developing Machine Learning models often involves repetitive setup and boilerpla
 This repository uses a mono-repo structure containing multiple independent Cookiecutter templates:
 
 ```
-Cookiecutter_machine_learning_template_library/
-├── docs/             # Global documentation source (MkDocs)
-├── hooks/            # Shared Cookiecutter hooks (optional)
-├── templates/        # Collection of ML project templates
-│   ├── barebone/     # Minimalistic template
-│   ├── barebone_classification/
-│   └── ...           # Other specialized templates (regression, RL, etc.)
-├── tests/            # Tests for template generation validation
-├── tasks.py          # Invoke tasks for automation
+cookiecutter-ml-templates/
+├── docs/                          # Global documentation source (MkDocs)
+├── hooks/                         # Shared Cookiecutter hooks
+├── templates/                     # Collection of ML project templates
+│   ├── barebone/                  # Minimal starting point
+│   ├── flow_matching/             # Flow matching / generative models
+│   ├── rl/                        # Reinforcement learning (SAC, TD3, PPO, RPO, DQN)
+│   ├── MNIST_wandb_image_logger/  # MNIST with W&B logging
+│   └── classification/            # Image classification (beta)
+├── tests/                         # Tests for template generation validation
 ├── .pre-commit-config.yaml
-├── .github/workflows/ # CI/CD pipelines
-├── README.md         # This file
-└── requirements.txt  # Dev dependencies for the meta-repo
+├── .github/workflows/             # CI/CD pipelines
+├── mkdocs.yml                     # Docs site config
+├── README.md                      # This file
+└── requirements.txt               # Dev dependencies for the meta-repo
 ```
-## Available Templates (Initial)
+## Available Templates
 
-* `templates/barebone`: A minimal starting point with the core structure.
-* `templates/barebone_classification`: Barebone template configured for a classification task.
-* *(Planned)* `mnist_classification`: A full example for MNIST classification.
-* *(Planned)* `barebone_regression`: Barebone template for regression.
-* *(Planned)* Other templates for Object Detection, Reinforcement Learning, LLM Finetuning, Diffusion Models, etc.
+| Template | Directory | Description | Status |
+|----------|-----------|-------------|--------|
+| **Barebone** | `templates/barebone` | Minimal starting point with core structure | ✅ Stable |
+| **Flow Matching** | `templates/flow_matching` | Complete flow matching implementation | ✅ Stable |
+| **Reinforcement Learning** | `templates/rl` | SAC, TD3, PPO, RPO, DQN with Gymnasium | ✅ Stable |
+| **MNIST W&B Logger** | `templates/MNIST_wandb_image_logger` | MNIST with Weights & Biases logging | ✅ Stable |
+| **Classification** | `templates/classification` | Image classification template | 🚧 Beta |
 
 ## Getting Started
 
@@ -79,13 +83,14 @@ To use a template, install Cookiecutter and point it to this repository, specify
 ```bash
 pip install cookiecutter
 
-# Example: Use the barebone classification template
-# Remember to replace YourUsername/YourRepoName with the actual repository path
+# Minimal starting point
 cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/barebone
 
-# Or use the full URL:
-# Remember to replace YourUsername/YourRepoName with the actual repository path
-cookiecutter https://github.com/MoustHolmes/cookiecutter-ml-templates --directory=templates/barebone
+# Reinforcement learning (SAC, TD3, PPO, RPO, DQN)
+cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/rl
+
+# Flow matching / generative models
+cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/flow_matching
 ```
 Follow the prompts to configure your new project.DocumentationFor detailed usage instructions, guides on the included tools, MLOps concepts, and contribution guidelines, please refer to the Full Documentation.
 ## Contributing

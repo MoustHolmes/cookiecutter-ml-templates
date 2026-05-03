@@ -1,0 +1,12 @@
+defaults:
+  - paths_config
+  - agent: sac
+  - environment: pendulum
+  - trainer: default_trainer
+  - callbacks: default_callbacks
+  - logger: wandb_logger
+  - experiment: null
+  - _self_
+
+task_name: rl_training
+profiling: false

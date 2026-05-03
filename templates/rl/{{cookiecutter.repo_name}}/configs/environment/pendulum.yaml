@@ -1,0 +1,27 @@
+# @package _global_
+
+# RLDataModule wrapping Pendulum-v1
+# Pendulum-v1: obs_dim=3 (cos θ, sin θ, θ̇), action_dim=1 (torque ∈ [-2, 2])
+env:
+  _target_: {{cookiecutter.repo_name}}.data.env_datamodule.RLDataModule
+  env_id: "Pendulum-v1"
+  buffer_size: 100000
+  batch_size: 256
+  num_workers: 0          # IterableDataset — keep at 0 for simplicity
+  seed: 42
+  normalize_obs: true     # RunningMeanStd normalisation (toggle to false to disable)
+  reward_scale: 1.0       # multiplicative reward scaling (increase to 10 for SAC entropy balance)
+  num_batches_per_epoch: 10  # how many buffer samples per Lightning epoch
+
+# Inject environment dimensions into agent sub-configs via Hydra composition
+# Pendulum action space: [-2, 2] → action_scale=2.0, action_bias=0.0
+agent:
+  actor:
+    obs_dim: 3
+    action_dim: 1
+    action_scale: 2.0     # (high - low) / 2
+    action_bias: 0.0      # (high + low) / 2
+  critic:
+    obs_dim: 3
+    action_dim: 1
+  # target_entropy auto-computed by SACModule as -action_dim when null

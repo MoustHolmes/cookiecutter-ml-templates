@@ -4,15 +4,15 @@ Choose the right template for your machine learning project.
 
 ## Template Comparison
 
-| Feature | Barebone | Flow Matching | MNIST W&B | Classification |
-|---------|----------|---------------|-----------|----------------|
-| **Status** | ✅ Stable | ✅ Stable | ✅ Stable | 🚧 Beta |
-| **Complexity** | Minimal | Complete | Medium | Medium |
-| **Best For** | Starting from scratch | Generative models | Quick experiments | Image classification |
-| **Includes Model** | Basic example | Full implementation | CNN classifier | Configurable models |
-| **W&B Integration** | Optional | Yes | Yes | Optional |
-| **Documentation** | Full | Full | Full | Partial |
-| **Tests** | ✅ | ✅ | ✅ | ⚠️ |
+| Feature | Barebone | Flow Matching | Reinforcement Learning | MNIST W&B | Classification |
+|---------|----------|---------------|------------------------|-----------|----------------|
+| **Status** | ✅ Stable | ✅ Stable | ✅ Stable | ✅ Stable | 🚧 Beta |
+| **Complexity** | Minimal | Complete | Complete | Medium | Medium |
+| **Best For** | Starting from scratch | Generative models | RL research & baselines | Quick experiments | Image classification |
+| **Includes Model** | Basic example | Full implementation | SAC/TD3/PPO/RPO/DQN | CNN classifier | Configurable models |
+| **W&B Integration** | Optional | Yes | Yes | Yes | Optional |
+| **Documentation** | Full | Full | Full | Full | Partial |
+| **Tests** | ✅ | ✅ | ✅ | ✅ | ⚠️ |
 
 ## Template Details
 
@@ -130,6 +130,46 @@ cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/MNIS
 
 ---
 
+### Reinforcement Learning Template
+
+**Perfect for:** RL research, algorithm benchmarking, and learning modern RL with clean code
+
+```bash
+cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/rl
+```
+
+**What's included:**
+
+- ✅ SAC, TD3, PPO (discrete & continuous), RPO, DQN
+- ✅ Gymnasium environment integration
+- ✅ Hydra configs per algorithm and environment
+- ✅ Pre-built experiment configs (pendulum, cartpole, lunar_lander)
+- ✅ Replay buffer (off-policy) and rollout buffer (on-policy)
+- ✅ Observation normalizer (RunningMeanStd)
+- ✅ Episode reward / video logging callbacks
+- ✅ W&B experiment tracking
+
+**Supported algorithms:**
+
+| Algorithm | Type | Action Space |
+|-----------|------|-------------|
+| SAC | Off-policy | Continuous |
+| TD3 | Off-policy | Continuous |
+| PPO | On-policy | Continuous & Discrete |
+| RPO | On-policy | Continuous |
+| DQN | Off-policy | Discrete |
+
+**Use cases:**
+
+- RL research and baselines
+- Benchmarking algorithms on Gymnasium tasks
+- Learning RL with structured, readable code
+- Starting point for custom RL environments
+
+[Learn more →](rl.md)
+
+---
+
 ### Classification Template
 
 **Perfect for:** Image classification tasks
@@ -167,6 +207,7 @@ graph TD
     A[Need ML Template] --> B{What type of task?}
     B -->|Generative| C[Flow Matching]
     B -->|Classification| D{Quick experiment?}
+    B -->|Reinforcement Learning| H[RL Template]
     B -->|Custom/Other| E[Barebone]
     D -->|Yes| F[MNIST W&B]
     D -->|No| G[Classification]
@@ -184,12 +225,13 @@ graph TD
 
 1. **Barebone** for most projects
 2. **Flow Matching** for generative models
-3. **Classification** for vision tasks
+3. **RL Template** for reinforcement learning
+4. **Classification** for vision tasks
 
 **Advanced:**
 
 1. **Barebone** with heavy customization
-2. **Flow Matching** as reference implementation
+2. **Flow Matching** or **RL Template** as reference implementations
 3. Create your own templates
 
 ### By Project Type
@@ -198,16 +240,19 @@ graph TD
 
 - **Barebone** - Maximum flexibility
 - **Flow Matching** - Generative research
+- **RL Template** - RL algorithm research and baselines
 
 **Production:**
 
 - **Barebone** - Clean slate for production code
 - **Classification** - Standard vision pipelines
+- **RL Template** - Structured RL pipelines
 
 **Learning:**
 
 - **MNIST W&B** - Understand ML workflow
-- **Flow Matching** - Learn advanced concepts
+- **Flow Matching** - Learn generative modeling
+- **RL Template** - Learn RL with clean, readable code
 
 ## Common Features
 

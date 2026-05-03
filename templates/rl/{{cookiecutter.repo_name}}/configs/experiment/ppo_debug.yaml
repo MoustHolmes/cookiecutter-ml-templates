@@ -1,0 +1,18 @@
+# @package _global_
+# Quick PPO sanity-check: ~5 updates, completes in seconds.
+
+trainer:
+  fast_dev_run: false
+  max_epochs: 5
+
+agent:
+  num_steps: 64
+  num_envs: 2
+  total_timesteps: 640    # 5 epochs * 2 envs * 64 steps
+  anneal_lr: false
+
+env:
+  num_envs: 2
+
+logger:
+  mode: disabled

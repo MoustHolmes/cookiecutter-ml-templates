@@ -1,0 +1,18 @@
+# @package _global_
+# Quick sanity-check run: completes in seconds.
+
+trainer:
+  fast_dev_run: true
+  max_epochs: 1
+
+environment:
+  buffer_size: 2000
+  batch_size: 32
+  num_batches_per_epoch: 1
+
+agent:
+  learning_starts: 100
+  batch_size: 32
+
+logger:
+  mode: disabled

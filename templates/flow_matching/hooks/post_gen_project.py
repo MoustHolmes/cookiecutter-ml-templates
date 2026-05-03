@@ -140,10 +140,13 @@ def main():
     print(f"1. cd {repo_name}")
     if deps_manager == "pip":
         print("2. pip install -r requirements.txt")
+        print("3. pip install -e .")
+        print(f"4. python src/{repo_name}/train.py experiment=moons  # Run training")
     else:
-        print("2. uv pip install -r requirements.txt")
-    print("3. pip install -e .")
-    print(f"4. python src/{repo_name}/train.py experiment=moons  # Run training")
+        print("2. uv venv")
+        print("3. source .venv/bin/activate")
+        print("4. uv pip install -e .")
+        print(f"5. python src/{repo_name}/train.py experiment=moons  # Run training")
     print("\n📖 Documentation: See README.md for more details")
     print("=" * 80 + "\n")
 

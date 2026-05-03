@@ -1,0 +1,36 @@
+_target_: {{cookiecutter.repo_name}}.ppo_module.PPOModule
+
+# PPOAgentContinuous — obs_dim / action_dim injected by env config
+agent:
+  _target_: {{cookiecutter.repo_name}}.models.ppo_agent.PPOAgentContinuous
+  obs_dim: ???
+  action_dim: ???
+  hidden_dim: 64
+  rpo_alpha: 0.0          # 0 = pure PPO; override to 0.5 for RPO
+
+# Rollout collection
+num_steps: 2048           # steps per env per PPO update (CleanRL continuous default)
+num_envs: 1
+
+# PPO hyperparameters
+gamma: 0.99
+gae_lambda: 0.95
+num_minibatches: 32
+update_epochs: 10
+clip_coef: 0.2
+ent_coef: 0.0
+vf_coef: 0.5
+max_grad_norm: 0.5
+norm_adv: true
+clip_vloss: true
+target_kl: null
+
+# LR annealing
+anneal_lr: true
+total_timesteps: 1000000
+
+optimizer:
+  _target_: torch.optim.Adam
+  _partial_: true
+  lr: 3.0e-4
+  eps: 1.0e-5

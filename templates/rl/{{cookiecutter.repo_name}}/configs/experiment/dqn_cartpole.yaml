@@ -1,0 +1,22 @@
+# @package _global_
+defaults:
+  - override /agent: dqn
+  - override /env: cartpole_replay
+  - _self_
+
+# DQN on CartPole-v1 — 500K env steps
+# 1000 steps/epoch × 500 epochs = 500K steps
+trainer:
+  max_epochs: 500
+  fast_dev_run: false
+
+env:
+  num_batches_per_epoch: 1000
+  buffer_size: 10000
+
+agent:
+  total_timesteps: 500000
+  learning_starts: 10000
+  train_frequency: 10
+  target_network_frequency: 500
+  exploration_fraction: 0.5

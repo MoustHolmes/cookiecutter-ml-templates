@@ -5,6 +5,7 @@ build-backend = "setuptools.build_meta"
 [tool.ruff]
 line-length = 120
 target-version = "py311"
+exclude = ["templates/"]
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -14,7 +15,7 @@ ignore = ["D100", "D103", "D104", "INP001", "T201"]
 convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["S101"]  # Allow assertions in test files
+"tests/*" = ["S101", "S607", "PLC0415", "PLW1510"]  # Test-only patterns
 
 [tool.coverage.run]
 include = ["src/*"]

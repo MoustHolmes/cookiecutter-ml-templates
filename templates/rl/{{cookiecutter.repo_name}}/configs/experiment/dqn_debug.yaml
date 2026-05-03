@@ -1,0 +1,22 @@
+# @package _global_
+# Quick DQN sanity-check: minimal steps, completes in seconds.
+
+trainer:
+  fast_dev_run: false
+  max_epochs: 5
+
+env:
+  buffer_size: 2000
+  batch_size: 32
+  num_batches_per_epoch: 20
+
+agent:
+  learning_starts: 100
+  batch_size: 32
+  train_frequency: 1
+  target_network_frequency: 50
+  total_timesteps: 100
+  exploration_fraction: 0.5
+
+logger:
+  mode: disabled

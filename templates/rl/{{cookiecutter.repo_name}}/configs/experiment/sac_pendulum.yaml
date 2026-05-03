@@ -1,0 +1,19 @@
+# @package _global_
+defaults:
+  - override /agent: sac
+  - override /env: pendulum
+  - _self_
+
+# SAC on Pendulum-v1 — ~1M env steps
+trainer:
+  max_epochs: 1000
+  fast_dev_run: false
+
+env:
+  num_batches_per_epoch: 1000  # 1000 collect+update steps per epoch
+  buffer_size: 1000000
+  reward_scale: 5.0            # helps SAC entropy balance on Pendulum
+
+agent:
+  learning_starts: 5000
+  batch_size: 256

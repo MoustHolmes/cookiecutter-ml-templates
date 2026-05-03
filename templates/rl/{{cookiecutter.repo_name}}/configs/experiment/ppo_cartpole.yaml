@@ -1,0 +1,20 @@
+# @package _global_
+defaults:
+  - override /agent: ppo_discrete
+  - override /env: cartpole
+  - _self_
+
+# PPO discrete on CartPole-v1 — 500K env steps
+# 128 steps × 4 envs × 977 epochs ≈ 500K steps
+trainer:
+  max_epochs: 977
+  fast_dev_run: false
+
+agent:
+  num_steps: 128
+  num_envs: 4
+  total_timesteps: 500000
+  anneal_lr: true
+
+env:
+  num_envs: 4

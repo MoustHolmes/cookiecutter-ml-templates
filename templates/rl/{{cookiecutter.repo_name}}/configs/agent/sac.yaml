@@ -1,0 +1,49 @@
+_target_: {{cookiecutter.repo_name}}.sac_module.SACModule
+
+# Actor network — obs_dim / action_dim are injected by the env config
+actor:
+  _target_: {{cookiecutter.repo_name}}.models.actor.StochasticActor
+  obs_dim: ???
+  action_dim: ???
+  hidden_dim: 256
+  num_layers: 2
+  log_std_min: -5
+  log_std_max: 2
+  action_scale: ???       # injected by env config: (high - low) / 2
+  action_bias: ???        # injected by env config: (high + low) / 2
+
+# Critic network
+critic:
+  _target_: {{cookiecutter.repo_name}}.models.critic.TwinCritic
+  obs_dim: ???
+  action_dim: ???
+  hidden_dim: 256
+  num_layers: 2
+
+# SAC hyperparameters
+gamma: 0.99             # discount factor
+tau: 0.005              # Polyak averaging coefficient for target networks
+batch_size: 256         # gradient-update mini-batch size
+learning_starts: 1000   # random-action warm-up steps before first gradient update
+collect_steps_per_update: 1   # env steps collected per training_step call
+gradient_steps: 1             # gradient updates per training_step call
+
+# Temperature / entropy auto-tuning
+init_alpha: 1.0         # initial temperature value (log_alpha is the learnable param)
+target_entropy: null    # null → auto-set to -action_dim at training start
+
+# Optimizers (partial instantiation — lr etc. can be overridden per experiment)
+actor_optimizer:
+  _target_: torch.optim.Adam
+  _partial_: true
+  lr: 3.0e-4
+
+critic_optimizer:
+  _target_: torch.optim.Adam
+  _partial_: true
+  lr: 3.0e-4
+
+alpha_optimizer:
+  _target_: torch.optim.Adam
+  _partial_: true
+  lr: 3.0e-4

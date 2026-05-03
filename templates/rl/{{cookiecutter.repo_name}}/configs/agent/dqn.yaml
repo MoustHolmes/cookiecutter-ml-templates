@@ -1,0 +1,29 @@
+_target_: {{cookiecutter.repo_name}}.dqn_module.DQNModule
+
+# QNetwork — obs_dim / n_actions injected by env config
+q_network:
+  _target_: {{cookiecutter.repo_name}}.models.qnetwork.QNetwork
+  obs_dim: ???
+  n_actions: ???
+
+# DQN hyperparameters
+gamma: 0.99
+tau: 1.0                  # 1.0 = hard target update (CleanRL default)
+batch_size: 128
+learning_starts: 10000
+
+# Update schedule
+train_frequency: 10        # gradient update every N env steps
+target_network_frequency: 500  # target network sync every N env steps
+
+# Epsilon-greedy exploration
+start_epsilon: 1.0
+end_epsilon: 0.05
+exploration_fraction: 0.5  # fraction of total_timesteps for epsilon decay
+
+total_timesteps: 500000
+
+optimizer:
+  _target_: torch.optim.Adam
+  _partial_: true
+  lr: 1.0e-4

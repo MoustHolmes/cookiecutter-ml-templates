@@ -84,6 +84,7 @@ cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/flow
 |----------|-------------|--------|
 | [**Barebone**](available-templates/barebone.md) | Minimal starting point with core structure | ✅ Stable |
 | [**Flow Matching**](available-templates/flow-matching.md) | Complete flow matching implementation | ✅ Stable |
+| [**Reinforcement Learning**](available-templates/rl.md) | SAC, TD3, PPO, RPO, DQN with Gymnasium | ✅ Stable |
 | [**MNIST W&B Logger**](available-templates/mnist-wandb.md) | MNIST with Weights & Biases logging | ✅ Stable |
 | [**Classification**](available-templates/classification.md) | Image classification template | 🚧 Beta |
 
@@ -120,12 +121,12 @@ cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/flow
 
 ### Recent Updates
 
+- 🤖 Added **Reinforcement Learning** template with SAC, TD3, PPO, RPO, and DQN
 - ✨ Added integration tests that validate generated projects
 - 🎯 Standardized structure across all templates
 - 📦 Optional project scaffolding (minimal vs full)
 - ⚡ UV package manager support
 - 🧪 Comprehensive test suite with pytest markers
-- 📝 Fixed all template bugs found by integration tests
 
 ## Next Steps
 

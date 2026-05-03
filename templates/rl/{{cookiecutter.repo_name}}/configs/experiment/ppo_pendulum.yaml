@@ -1,0 +1,20 @@
+# @package _global_
+defaults:
+  - override /agent: ppo_continuous
+  - override /env: pendulum_ppo
+  - _self_
+
+# PPO continuous on Pendulum-v1 — 1M env steps
+# 2048 steps × 1 env × 488 epochs ≈ 1M steps
+trainer:
+  max_epochs: 488
+  fast_dev_run: false
+
+agent:
+  num_steps: 2048
+  num_envs: 1
+  total_timesteps: 1000000
+  anneal_lr: true
+
+env:
+  num_envs: 1

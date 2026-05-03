@@ -1,0 +1,18 @@
+# @package _global_
+defaults:
+  - override /agent: td3
+  - override /env: lunar_lander
+  - _self_
+
+# TD3 on LunarLanderContinuous-v3 — ~1M env steps
+# Requires: pip install gymnasium[box2d]
+trainer:
+  max_epochs: 1000
+  fast_dev_run: false
+
+env:
+  num_batches_per_epoch: 1000
+
+agent:
+  learning_starts: 5000
+  batch_size: 256

@@ -1,0 +1,196 @@
+"""Tests for ReplayBuffer, RLDataModule, RolloutDataModule, and related classes."""
+
+from __future__ import annotations
+
+import numpy as np
+import pytest
+import torch
+from torch.utils.data import DataLoader
+
+from {{cookiecutter.repo_name}}.data.env_datamodule import RLDataModule, ReplayBufferDataset
+from {{cookiecutter.repo_name}}.data.replay_buffer import Batch, ReplayBuffer
+from {{cookiecutter.repo_name}}.data.rollout_datamodule import RolloutDataModule
+
+OBS_DIM = 3
+ACTION_DIM = 1
+
+
+# ---------------------------------------------------------------------------
+# ReplayBuffer
+# ---------------------------------------------------------------------------
+
+class TestReplayBuffer:
+    def test_empty_on_init(self, small_replay_buffer: ReplayBuffer) -> None:
+        assert len(small_replay_buffer) == 0
+
+    def test_len_increments_on_add(self, small_replay_buffer: ReplayBuffer) -> None:
+        small_replay_buffer.add(
+            obs=np.zeros(OBS_DIM, dtype=np.float32),
+            action=np.zeros(ACTION_DIM, dtype=np.float32),
+            reward=0.0,
+            next_obs=np.zeros(OBS_DIM, dtype=np.float32),
+            terminated=False,
+            truncated=False,
+        )
+        assert len(small_replay_buffer) == 1
+
+    def test_circular_wrap(self, small_replay_buffer: ReplayBuffer) -> None:
+        """Buffer length must not exceed capacity after overflow."""
+        for _ in range(1100):  # buffer_size=1000
+            small_replay_buffer.add(
+                np.zeros(OBS_DIM, dtype=np.float32),
+                np.zeros(ACTION_DIM, dtype=np.float32),
+                0.0,
+                np.zeros(OBS_DIM, dtype=np.float32),
+                False,
+                False,
+            )
+        assert len(small_replay_buffer) == 1000
+
+    def test_sample_shapes(self, filled_replay_buffer: ReplayBuffer) -> None:
+        """Sampled batch must have correct tensor shapes."""
+        batch = filled_replay_buffer.sample(32)
+        assert isinstance(batch, Batch)
+        assert batch.obs.shape == (32, OBS_DIM)
+        assert batch.action.shape == (32, ACTION_DIM)
+        assert batch.reward.shape == (32,)
+        assert batch.next_obs.shape == (32, OBS_DIM)
+        assert batch.done.shape == (32,)
+
+    def test_sample_dtypes_float32(self, filled_replay_buffer: ReplayBuffer) -> None:
+        """All sampled tensors must be float32."""
+        batch = filled_replay_buffer.sample(32)
+        for tensor in (batch.obs, batch.action, batch.reward, batch.next_obs, batch.done):
+            assert tensor.dtype == torch.float32
+
+    def test_truncation_does_not_set_done(self, small_replay_buffer: ReplayBuffer) -> None:
+        """Truncated=True, terminated=False → done must be stored as 0.0."""
+        small_replay_buffer.add(
+            np.zeros(OBS_DIM, dtype=np.float32),
+            np.zeros(ACTION_DIM, dtype=np.float32),
+            1.0,
+            np.zeros(OBS_DIM, dtype=np.float32),
+            terminated=False,
+            truncated=True,
+        )
+        assert small_replay_buffer._done[0] == 0.0
+
+    def test_termination_sets_done(self, small_replay_buffer: ReplayBuffer) -> None:
+        """terminated=True → done must be stored as 1.0."""
+        small_replay_buffer.add(
+            np.zeros(OBS_DIM, dtype=np.float32),
+            np.zeros(ACTION_DIM, dtype=np.float32),
+            1.0,
+            np.zeros(OBS_DIM, dtype=np.float32),
+            terminated=True,
+            truncated=False,
+        )
+        assert small_replay_buffer._done[0] == 1.0
+
+    def test_sample_raises_when_underfilled(self, small_replay_buffer: ReplayBuffer) -> None:
+        """Sampling more transitions than available must raise ValueError."""
+        with pytest.raises(ValueError, match="Buffer has"):
+            small_replay_buffer.sample(10)
+
+
+# ---------------------------------------------------------------------------
+# RLDataModule
+# ---------------------------------------------------------------------------
+
+class TestRLDataModule:
+    def test_setup_creates_env_and_buffer(self, pendulum_datamodule: RLDataModule) -> None:
+        assert pendulum_datamodule.env is not None
+        assert pendulum_datamodule.replay_buffer is not None
+
+    def test_obs_action_dims_inferred(self, pendulum_datamodule: RLDataModule) -> None:
+        """Pendulum-v1 has obs_dim=3, action_dim=1."""
+        assert pendulum_datamodule.obs_dim == OBS_DIM
+        assert pendulum_datamodule.action_dim == ACTION_DIM
+
+    def test_collect_random_fills_buffer(self, pendulum_datamodule: RLDataModule) -> None:
+        """collect_experience with no policy_fn must use random actions."""
+        pendulum_datamodule.collect_experience(n_steps=50, policy_fn=None)
+        assert len(pendulum_datamodule.replay_buffer) == 50
+
+    def test_collect_with_policy(self, pendulum_datamodule: RLDataModule) -> None:
+        """collect_experience with a policy_fn must also fill the buffer."""
+        def zero_policy(obs: torch.Tensor) -> torch.Tensor:
+            return torch.zeros(obs.shape[0], ACTION_DIM)
+
+        pendulum_datamodule.collect_experience(n_steps=20, policy_fn=zero_policy)
+        assert len(pendulum_datamodule.replay_buffer) == 20
+
+    def test_episode_tracking(self, pendulum_datamodule: RLDataModule) -> None:
+        """episode_rewards and episode_lengths must be populated after an episode ends."""
+        pendulum_datamodule.collect_experience(n_steps=300, policy_fn=None)
+        # Pendulum episodes are 200 steps — at least one should have finished
+        assert len(pendulum_datamodule.episode_rewards) >= 1
+        assert len(pendulum_datamodule.episode_lengths) >= 1
+
+
+# ---------------------------------------------------------------------------
+# ReplayBufferDataset
+# ---------------------------------------------------------------------------
+
+class TestReplayBufferDataset:
+    def test_yields_correct_number_of_batches(self, filled_replay_buffer: ReplayBuffer) -> None:
+        dataset = ReplayBufferDataset(buffer=filled_replay_buffer, batch_size=32, num_batches=5)
+        batches = list(iter(dataset))
+        assert len(batches) == 5
+
+    def test_batch_shapes(self, filled_replay_buffer: ReplayBuffer) -> None:
+        dataset = ReplayBufferDataset(buffer=filled_replay_buffer, batch_size=32, num_batches=1)
+        batch = next(iter(dataset))
+        assert isinstance(batch, Batch)
+        assert batch.obs.shape == (32, OBS_DIM)
+        assert batch.action.shape == (32, ACTION_DIM)
+
+    def test_dataloader_batch_size_none(self, pendulum_datamodule: RLDataModule) -> None:
+        """RLDataModule.train_dataloader() must not wrap batches in another collation."""
+        pendulum_datamodule.collect_experience(n_steps=200)
+        loader = pendulum_datamodule.train_dataloader()
+        assert isinstance(loader, DataLoader)
+        batch = next(iter(loader))
+        assert isinstance(batch, Batch)
+        assert batch.obs.shape[1] == OBS_DIM
+
+
+# ---------------------------------------------------------------------------
+# RolloutDataModule
+# ---------------------------------------------------------------------------
+
+class TestRolloutDataModule:
+    def test_setup_creates_envs(self, cartpole_rollout_datamodule: RolloutDataModule) -> None:
+        assert cartpole_rollout_datamodule.envs is not None
+
+    def test_obs_shape_cartpole(self, cartpole_rollout_datamodule: RolloutDataModule) -> None:
+        """CartPole-v1 observation space is Box(4,)."""
+        assert cartpole_rollout_datamodule.obs_shape == (4,)
+
+    def test_act_shape_discrete(self, cartpole_rollout_datamodule: RolloutDataModule) -> None:
+        """Discrete action space — act_shape is () (scalar)."""
+        assert cartpole_rollout_datamodule.act_shape == ()
+
+    def test_is_not_continuous(self, cartpole_rollout_datamodule: RolloutDataModule) -> None:
+        assert cartpole_rollout_datamodule.is_continuous is False
+
+    def test_num_envs_matches_config(self, cartpole_rollout_datamodule: RolloutDataModule) -> None:
+        obs, _ = cartpole_rollout_datamodule.envs.reset()
+        assert obs.shape[0] == 2  # num_envs=2 in fixture
+
+    def test_train_dataloader_has_one_item(self, cartpole_rollout_datamodule: RolloutDataModule) -> None:
+        """The dummy trigger dataloader must yield exactly one item per epoch."""
+        loader = cartpole_rollout_datamodule.train_dataloader()
+        assert len(list(loader)) == 1
+
+    def test_episode_lists_empty_on_init(self, cartpole_rollout_datamodule: RolloutDataModule) -> None:
+        assert cartpole_rollout_datamodule.episode_rewards == []
+        assert cartpole_rollout_datamodule.episode_lengths == []
+
+    def test_teardown_closes_envs(self) -> None:
+        """teardown() must close envs and set self.envs to None."""
+        dm = RolloutDataModule(env_id="CartPole-v1", num_envs=1, seed=0)
+        dm.setup("fit")
+        assert dm.envs is not None
+        dm.teardown("fit")
+        assert dm.envs is None

@@ -1,0 +1,17 @@
+# @package _global_
+
+# RolloutDataModule wrapping LunarLanderContinuous-v3 — for PPO continuous / RPO
+# obs_dim=8, action_dim=2 (main engine + lateral ∈ [-1, 1])
+# Requires: pip install gymnasium[box2d]
+env:
+  _target_: {{cookiecutter.repo_name}}.data.rollout_datamodule.RolloutDataModule
+  env_id: "LunarLanderContinuous-v3"
+  num_envs: 1
+  seed: 42
+
+# Inject environment dimensions into agent sub-configs
+agent:
+  agent:
+    obs_dim: 8
+    action_dim: 2
+  num_envs: 1             # must match env.num_envs

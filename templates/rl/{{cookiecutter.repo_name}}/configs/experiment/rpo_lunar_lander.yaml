@@ -1,0 +1,20 @@
+# @package _global_
+defaults:
+  - override /agent: rpo
+  - override /env: lunar_lander_ppo
+  - _self_
+
+# RPO on LunarLanderContinuous-v3 — 1M env steps
+# Requires: pip install gymnasium[box2d]
+trainer:
+  max_epochs: 488
+  fast_dev_run: false
+
+agent:
+  num_steps: 2048
+  num_envs: 1
+  total_timesteps: 1000000
+  anneal_lr: true
+
+env:
+  num_envs: 1

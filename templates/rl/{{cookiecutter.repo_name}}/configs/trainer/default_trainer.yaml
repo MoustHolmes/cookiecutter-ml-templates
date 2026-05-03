@@ -1,0 +1,14 @@
+_target_: lightning.pytorch.Trainer
+
+# Each Lightning "epoch" = one round of collect_steps + gradient_steps.
+# Use max_epochs to control total training duration.
+max_epochs: 500
+log_every_n_steps: 1
+
+accelerator: cpu
+devices: 1
+
+# RL has no separate validation phase; evaluation is done via EpisodeLoggerCallback.
+check_val_every_n_epoch: 50
+enable_checkpointing: true
+deterministic: false

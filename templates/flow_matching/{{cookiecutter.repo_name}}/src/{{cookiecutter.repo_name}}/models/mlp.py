@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from {{cookiecutter.repo_name}}.models.unet import FourierEncoder
 
 class MoonsNet(nn.Module):
     """
@@ -10,7 +11,6 @@ class MoonsNet(nn.Module):
         super().__init__()
 
         # Time embedding - same style as UNet
-        from {{cookiecutter.repo_name}}.models.unet import FourierEncoder
         self.time_mlp = nn.Sequential(
             FourierEncoder(time_dim),
             nn.Linear(time_dim, time_dim),

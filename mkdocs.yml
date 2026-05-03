@@ -57,6 +57,7 @@ nav:
       - Overview: available-templates/overview.md
       - Barebone: available-templates/barebone.md
       - Flow Matching: available-templates/flow-matching.md
+      - Reinforcement Learning: available-templates/rl.md
       - MNIST W&B Logger: available-templates/mnist-wandb.md
       - Classification: available-templates/classification.md
   - Guides:

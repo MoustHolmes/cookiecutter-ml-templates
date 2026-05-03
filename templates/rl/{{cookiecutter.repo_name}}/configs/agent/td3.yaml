@@ -1,0 +1,44 @@
+_target_: {{cookiecutter.repo_name}}.td3_module.TD3Module
+
+# Deterministic actor — obs_dim / action_dim injected by env config
+actor:
+  _target_: {{cookiecutter.repo_name}}.models.actor.DeterministicActor
+  obs_dim: ???
+  action_dim: ???
+  hidden_dim: 256
+  num_layers: 2
+  action_scale: ???       # injected by env config: (high - low) / 2
+  action_bias: ???        # injected by env config: (high + low) / 2
+
+# Shared TwinCritic (identical architecture to SAC)
+critic:
+  _target_: {{cookiecutter.repo_name}}.models.critic.TwinCritic
+  obs_dim: ???
+  action_dim: ???
+  hidden_dim: 256
+  num_layers: 2
+
+# TD3 hyperparameters
+gamma: 0.99
+tau: 0.005
+batch_size: 256
+learning_starts: 1000
+collect_steps_per_update: 1
+gradient_steps: 1
+
+# TD3-specific stabilisation
+policy_delay: 2           # actor + target networks updated every N critic steps
+exploration_noise: 0.1    # std of Gaussian noise added to actions during collection
+target_noise: 0.2         # std of smoothing noise added to target policy actions
+target_noise_clip: 0.5    # clip range for target smoothing noise
+
+# Optimizers
+actor_optimizer:
+  _target_: torch.optim.Adam
+  _partial_: true
+  lr: 3.0e-4
+
+critic_optimizer:
+  _target_: torch.optim.Adam
+  _partial_: true
+  lr: 3.0e-4

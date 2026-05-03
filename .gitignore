@@ -85,3 +85,8 @@ multirun/
 .python-version
 poetry.lock
 pdm.lock
+
+# test template 
+test_temp/
+inspiration_code/
+
