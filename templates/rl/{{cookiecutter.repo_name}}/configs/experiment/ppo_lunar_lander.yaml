@@ -1,7 +1,7 @@
 # @package _global_
 defaults:
   - override /agent: ppo_continuous
-  - override /env: lunar_lander_ppo
+  - override /environment: lunar_lander_ppo
   - _self_
 
 # PPO continuous on LunarLanderContinuous-v3 — 1M env steps

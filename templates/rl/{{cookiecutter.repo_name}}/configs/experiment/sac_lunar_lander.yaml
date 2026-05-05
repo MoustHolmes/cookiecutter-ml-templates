@@ -1,7 +1,7 @@
 # @package _global_
 defaults:
   - override /agent: sac
-  - override /env: lunar_lander
+  - override /environment: lunar_lander
   - _self_
 
 # SAC on LunarLanderContinuous-v3 — ~1M env steps

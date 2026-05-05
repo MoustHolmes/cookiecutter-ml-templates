@@ -37,8 +37,7 @@ nbstripout = ">=0.7.1"
 cuda = "12"
 
 [environments]
-default = { solve-group = "default" }
-dev = { features = ["dev"], solve-group = "default" }
+default = { features = ["dev"], solve-group = "default" }
 cuda = { features = ["cuda", "dev"], solve-group = "default" }
 
 [tasks]

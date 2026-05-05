@@ -24,6 +24,24 @@ pip install -e ".[dev]"
 
 ## Training
 
+{% if cookiecutter.deps_manager == "pixi" %}
+```bash
+# Train SAC on Pendulum-v1 (default)
+pixi run train
+
+# Train TD3 instead
+pixi run train-td3
+
+# Fast debug run (single step, tiny buffer)
+pixi run train experiment=debug
+
+# Train on LunarLanderContinuous-v2
+pixi run train experiment=lunar_lander
+
+# Override hyperparameters from the command line
+pixi run train agent.gamma=0.98 env.normalize_obs=false
+```
+{% else %}
 ```bash
 # Train SAC on Pendulum-v1 (default)
 python src/{{cookiecutter.repo_name}}/train.py
@@ -32,20 +50,27 @@ python src/{{cookiecutter.repo_name}}/train.py
 python src/{{cookiecutter.repo_name}}/train.py agent=td3
 
 # Fast debug run (single step, tiny buffer)
-python src/{{cookiecutter.repo_name}}/train.py +experiment=debug
+python src/{{cookiecutter.repo_name}}/train.py experiment=debug
 
 # Train on LunarLanderContinuous-v2
-python src/{{cookiecutter.repo_name}}/train.py +experiment=lunar_lander
+python src/{{cookiecutter.repo_name}}/train.py experiment=lunar_lander
 
 # Override hyperparameters from the command line
 python src/{{cookiecutter.repo_name}}/train.py agent.gamma=0.98 env.normalize_obs=false
 ```
+{% endif %}
 
 ## Testing
 
+{% if cookiecutter.deps_manager == "pixi" %}
+```bash
+pixi run test
+```
+{% else %}
 ```bash
 pytest tests/ -v
 ```
+{% endif %}
 
 ## Project Layout
 

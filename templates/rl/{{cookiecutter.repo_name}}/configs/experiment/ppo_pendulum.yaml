@@ -1,7 +1,7 @@
 # @package _global_
 defaults:
   - override /agent: ppo_continuous
-  - override /env: pendulum_ppo
+  - override /environment: pendulum_ppo
   - _self_
 
 # PPO continuous on Pendulum-v1 — 1M env steps

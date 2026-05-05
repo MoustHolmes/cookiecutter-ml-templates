@@ -1,6 +1,11 @@
 # @package _global_
 # Quick PPO sanity-check: ~5 updates, completes in seconds.
 
+defaults:
+  - override /agent: ppo_discrete
+  - override /environment: cartpole
+  - _self_
+
 trainer:
   fast_dev_run: false
   max_epochs: 5

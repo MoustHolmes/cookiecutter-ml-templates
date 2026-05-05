@@ -1,7 +1,7 @@
 # @package _global_
 defaults:
   - override /agent: rpo
-  - override /env: lunar_lander_ppo
+  - override /environment: lunar_lander_ppo
   - _self_
 
 # RPO on LunarLanderContinuous-v3 — 1M env steps

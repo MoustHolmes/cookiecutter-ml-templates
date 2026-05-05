@@ -33,23 +33,9 @@ def test_sac_fast_dev_run(tmp_path) -> None:
 
 def test_ppo_cartpole_fast_dev_run(tmp_path) -> None:
     """PPO discrete + CartPole debug run must complete without errors."""
-    _fit(
-        [
-            "agent=ppo_discrete",
-            "env=cartpole",
-            "experiment=ppo_debug",
-        ],
-        tmp_path,
-    )
+    _fit(["experiment=ppo_debug"], tmp_path)
 
 
 def test_dqn_cartpole_fast_dev_run(tmp_path) -> None:
     """DQN + CartPole debug run must complete without errors."""
-    _fit(
-        [
-            "agent=dqn",
-            "env=cartpole_replay",
-            "experiment=dqn_debug",
-        ],
-        tmp_path,
-    )
+    _fit(["experiment=dqn_debug"], tmp_path)

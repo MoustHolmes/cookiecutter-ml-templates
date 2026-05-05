@@ -5,7 +5,7 @@ trainer:
   fast_dev_run: true
   max_epochs: 1
 
-environment:
+env:
   buffer_size: 2000
   batch_size: 32
   num_batches_per_epoch: 1
