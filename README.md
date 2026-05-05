@@ -41,9 +41,9 @@ Developing Machine Learning models often involves repetitive setup and boilerpla
 * Linting/Formatting: [Ruff](https://docs.astral.sh/ruff/), [Black](https://github.com/psf/black)
 * Pre-commit Hooks: [pre-commit](https://pre-commit.com/)
 * Testing: [Pytest](https://docs.pytest.org/)
-* Task Runner: [Invoke](https://www.pyinvoke.org/)
+* Task Runner: [Invoke](https://www.pyinvoke.org/) (pip/uv) · [Pixi](https://pixi.sh/) (pixi)
 * Documentation: [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/)
-* Environment Management: [Conda](https://docs.conda.io/) (Recommended, potentially with `uv` support later)
+* Environment Management: [Pixi](https://pixi.sh/) · [uv](https://docs.astral.sh/uv/) · [Conda](https://docs.conda.io/)
 
 ## Repository Structure
 
@@ -78,11 +78,26 @@ cookiecutter-ml-templates/
 
 ## Getting Started
 
-To use a template, install Cookiecutter and point it to this repository, specifying the desired template directory:
+### 1. Install Cookiecutter
 
 ```bash
 pip install cookiecutter
+```
 
+### 2. (Optional) Pre-fill your name and email
+
+Run once to save your git identity to `~/.cookiecutterrc`. After this, every template prompt for `author_name`, `author_email`, and `github_username` will be pre-filled — you can still edit them at the prompt.
+
+```bash
+# Clone this repo first, then:
+invoke setup-defaults
+```
+
+This reads from `git config --global user.name`, `git config --global user.email`, and `gh api user` (GitHub CLI, optional). The values are written to `~/.cookiecutterrc` and picked up automatically by all cookiecutter templates.
+
+### 3. Generate a project
+
+```bash
 # Minimal starting point
 cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/barebone
 
@@ -92,7 +107,16 @@ cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/rl
 # Flow matching / generative models
 cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/flow_matching
 ```
-Follow the prompts to configure your new project.DocumentationFor detailed usage instructions, guides on the included tools, MLOps concepts, and contribution guidelines, please refer to the Full Documentation.
+
+Follow the prompts. Each template asks for `deps_manager` — choose **pixi**, **uv**, or **pip**:
+
+| Choice | What you get |
+|--------|-------------|
+| `pixi` | `pixi.toml` with conda-forge deps + built-in task runner (`pixi run train`) |
+| `uv`   | `pyproject.toml` inline deps + `tasks.py` using `uv run` |
+| `pip`  | `requirements.txt` + `tasks.py` using standard pip |
+
+For detailed usage instructions, guides on the included tools, and MLOps concepts, refer to the Full Documentation.
 ## Contributing
 Contributions are welcome! Please read the Contributing Guidelines (to be created) and check the Issues page.
 ## License
