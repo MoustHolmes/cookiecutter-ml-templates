@@ -1,20 +1,37 @@
 _target_: {{cookiecutter.repo_name}}.ppo_module.PPOModule
 
-# PPOAgentDiscrete — obs_dim / n_actions injected by env config
-agent:
-  _target_: {{cookiecutter.repo_name}}.models.ppo_agent.PPOAgentDiscrete
-  obs_dim: ???
-  n_actions: ???
+# Actor MLP — input_dim / output_dim injected by the env config
+actor:
+  _target_: {{cookiecutter.repo_name}}.models.MLP
+  input_dim: ???
+  output_dim: ???         # n_actions (logits)
   hidden_dim: 64
+  num_layers: 2
+  activation: tanh
+  orthogonal_init: true
+  output_std: 0.01
+
+# Critic MLP — input_dim injected by the env config
+critic:
+  _target_: {{cookiecutter.repo_name}}.models.MLP
+  input_dim: ???
+  output_dim: 1
+  hidden_dim: 64
+  num_layers: 2
+  activation: tanh
+  orthogonal_init: true
+  output_std: 1.0
+
+discrete: true
 
 # Rollout collection
-num_steps: 128          # steps per env per PPO update
+num_steps: 128
 num_envs: 4             # must match RolloutDataModule.num_envs
 
 # PPO hyperparameters
 gamma: 0.99
 gae_lambda: 0.95
-num_minibatches: 4      # batch_size = num_steps * num_envs = 512; mb = 128
+num_minibatches: 4
 update_epochs: 4
 clip_coef: 0.2
 ent_coef: 0.01

@@ -1,1 +1,5 @@
-"""Neural network architectures for actor and critic networks."""
+"""Neural network architectures for RL agents."""
+
+from .mlp import MLP
+
+__all__ = ["MLP"]

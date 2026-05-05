@@ -16,5 +16,5 @@ env:
 # Inject environment dimensions into agent sub-configs
 agent:
   q_network:
-    obs_dim: 4
-    n_actions: 2
+    input_dim: 4
+    output_dim: 2

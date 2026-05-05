@@ -2,7 +2,5 @@ defaults:
   - ppo_continuous
   - _self_
 
-# RPO = PPO continuous + uniform perturbation to the action mean during gradient update.
-# Only change from ppo_continuous is rpo_alpha.
-agent:
-  rpo_alpha: 0.5
+# RPO = PPO continuous + uniform perturbation to the action mean during log-prob evaluation.
+rpo_alpha: 0.5

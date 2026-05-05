@@ -11,7 +11,11 @@ env:
 
 # Inject environment dimensions into agent sub-configs
 agent:
-  agent:
-    obs_dim: 8
-    action_dim: 2
+  actor:
+    input_dim: 8
+    output_dim: 2
+  critic:
+    input_dim: 8
+  discrete: false
+  action_dim: 2
   num_envs: 1             # must match env.num_envs

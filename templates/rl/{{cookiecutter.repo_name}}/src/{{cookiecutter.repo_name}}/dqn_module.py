@@ -18,8 +18,9 @@ import torch.nn.functional as F
 import lightning as L
 from torch.optim import Adam
 
+import torch.nn as nn
+
 from {{cookiecutter.repo_name}}.data.replay_buffer import Batch
-from {{cookiecutter.repo_name}}.models.qnetwork import QNetwork
 
 
 class DQNModule(L.LightningModule):
@@ -31,7 +32,8 @@ class DQNModule(L.LightningModule):
     target-network update based on the step counters.
 
     Args:
-        q_network: QNetwork instance.
+        q_network: Any ``nn.Module`` mapping ``(B, obs_dim) → (B, n_actions)``
+            Q-values; use :class:`~{{cookiecutter.repo_name}}.models.MLP` directly.
         gamma: Discount factor.
         tau: Soft-update coefficient for target network (1.0 = hard update).
         batch_size: Mini-batch size for gradient updates.
@@ -49,7 +51,7 @@ class DQNModule(L.LightningModule):
 
     def __init__(
         self,
-        q_network: QNetwork,
+        q_network: nn.Module,
         gamma: float = 0.99,
         tau: float = 1.0,
         batch_size: int = 128,
