@@ -1,4 +1,4 @@
-[project]
+[workspace]
 name = "{{cookiecutter.repo_name}}"
 version = "0.0.1"
 description = "{{cookiecutter.description}}"
@@ -16,6 +16,9 @@ numpy = ">=1.24.0"
 omegaconf = ">=2.3.0"
 pydantic = ">=2.0.0"
 loguru = ">=0.7.0"
+
+[pypi-dependencies]
+{{cookiecutter.repo_name}} = { path = ".", editable = true }
 
 [feature.dev.dependencies]
 pytest = ">=8.0.0"
