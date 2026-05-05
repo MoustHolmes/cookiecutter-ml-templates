@@ -26,6 +26,29 @@ Flow Matching is a simulation-free approach to training continuous normalizing f
 
 ### Installation
 
+{% if cookiecutter.deps_manager == "pixi" %}
+1. Install dependencies:
+```bash
+pixi install
+```
+
+2. Initialize pre-commit hooks:
+```bash
+pixi run pre-commit install
+```
+{% elif cookiecutter.deps_manager == "uv" %}
+1. Create virtual environment and install dependencies:
+```bash
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+uv pip install -e ".[dev]"
+```
+
+2. Initialize pre-commit hooks:
+```bash
+pre-commit install
+```
+{% else %}
 1. Create and activate a conda environment:
 ```bash
 conda create -n {{cookiecutter.repo_name}} python={{cookiecutter.python_version}}
@@ -34,14 +57,14 @@ conda activate {{cookiecutter.repo_name}}
 
 2. Install the package:
 ```bash
-pip install -e .  # Basic installation
-pip install -e ".[dev]"  # With development dependencies
+pip install -e ".[dev]"
 ```
 
-3. Initialize pre-commit hooks (optional):
+3. Initialize pre-commit hooks:
 ```bash
 pre-commit install
 ```
+{% endif %}
 
 ### Quick Training Examples
 

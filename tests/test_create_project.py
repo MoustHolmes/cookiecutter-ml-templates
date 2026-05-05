@@ -723,6 +723,96 @@ def test_rl_template_structure(temp_dir: Path) -> None:
         assert (tests / test_file).exists(), f"Missing tests/{test_file}"
 
 
+def test_barebone_with_pixi_deps_manager(temp_dir: Path) -> None:
+    """Test generation of barebone template with pixi dependency manager.
+
+    Args:
+        temp_dir: temporary directory for test
+    """
+    output_dir = temp_dir / "pixi_test"
+    current_dir = Path(__file__).parent
+    template_dir = (current_dir / ".." / "templates" / "barebone").resolve()
+
+    cookiecutter(
+        template=str(template_dir),
+        output_dir=str(output_dir),
+        no_input=True,
+        extra_context={
+            "project_name": "test_pixi",
+            "author_name": "Test Author",
+            "description": "Test Pixi Dependency Manager",
+            "python_version": "3.12",
+            "deps_manager": "pixi",
+        },
+    )
+
+    generated_dir = output_dir / "test_pixi"
+    assert generated_dir.exists()
+
+    # pixi.toml must exist; invoke/pip artefacts must not
+    assert (generated_dir / "pixi.toml").exists()
+    assert not (generated_dir / "tasks.py").exists()
+    assert not (generated_dir / "tasks_pip.py").exists()
+    assert not (generated_dir / "tasks_uv.py").exists()
+    assert not (generated_dir / "requirements.txt").exists()
+    assert not (generated_dir / "requirements_dev.txt").exists()
+
+    # pyproject.toml exists but uses hatchling and has no inline deps
+    pyproject_file = generated_dir / "pyproject.toml"
+    assert pyproject_file.exists()
+    with pyproject_file.open("r") as f:
+        pyproject_content = f.read()
+    assert "hatchling" in pyproject_content
+    assert "Dependencies managed by pixi" in pyproject_content
+
+    # README shows pixi instructions
+    readme_file = generated_dir / "README.md"
+    assert readme_file.exists()
+    with readme_file.open("r") as f:
+        readme_content = f.read()
+    assert "pixi install" in readme_content
+    assert "pixi run" in readme_content
+
+
+def test_rl_template_with_pixi_deps_manager(temp_dir: Path) -> None:
+    """Test generation of RL template with pixi dependency manager.
+
+    Args:
+        temp_dir: temporary directory for test
+    """
+    output_dir = temp_dir / "rl_pixi_test"
+    current_dir = Path(__file__).parent
+    template_dir = (current_dir / ".." / "templates" / "rl").resolve()
+
+    cookiecutter(
+        template=str(template_dir),
+        output_dir=str(output_dir),
+        no_input=True,
+        extra_context={
+            "project_name": "test_rl_pixi",
+            "author_name": "Test Author",
+            "description": "Test RL Pixi Dependency Manager",
+            "python_version": "3.11",
+            "deps_manager": "pixi",
+        },
+    )
+
+    generated_dir = output_dir / "test_rl_pixi"
+    assert generated_dir.exists()
+
+    assert (generated_dir / "pixi.toml").exists()
+    assert not (generated_dir / "tasks.py").exists()
+    assert not (generated_dir / "requirements.txt").exists()
+    assert not (generated_dir / "requirements_dev.txt").exists()
+
+    pixi_file = generated_dir / "pixi.toml"
+    with pixi_file.open("r") as f:
+        pixi_content = f.read()
+    assert "gymnasium" in pixi_content
+    assert "[tasks]" in pixi_content
+    assert "train" in pixi_content
+
+
 def test_rl_template_with_uv_deps_manager(temp_dir: Path) -> None:
     """Test generation of RL template with UV dependency manager.
 

@@ -53,7 +53,30 @@ A minimal, well-structured machine learning project template with emphasis on:
 
 ## Getting Started
 
-1. Create environment:
+{% if cookiecutter.deps_manager == "pixi" %}
+1. Install dependencies:
+```bash
+pixi install
+```
+
+2. Initialize pre-commit hooks:
+```bash
+pixi run pre-commit install
+```
+{% elif cookiecutter.deps_manager == "uv" %}
+1. Create virtual environment and install dependencies:
+```bash
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+uv pip install -e ".[dev]"
+```
+
+2. Initialize pre-commit hooks:
+```bash
+pre-commit install
+```
+{% else %}
+1. Create conda environment:
 ```bash
 conda create -n {{cookiecutter.repo_name}} python={{cookiecutter.python_version}}
 conda activate {{cookiecutter.repo_name}}
@@ -61,24 +84,36 @@ conda activate {{cookiecutter.repo_name}}
 
 2. Install dependencies:
 ```bash
-pip install -e ".[dev]"  # Install package in development mode with dev dependencies
+pip install -e ".[dev]"
 ```
 
 3. Initialize pre-commit hooks:
 ```bash
 pre-commit install
 ```
+{% endif %}
 
 ## Development Workflow
 
+{% if cookiecutter.deps_manager == "pixi" %}
+Tasks are defined in `pixi.toml` and run with `pixi run`:
+
+- `pixi run train` - Run training
+- `pixi run test` - Run tests
+- `pixi run lint` - Lint code
+- `pixi run format` - Format code
+- `pixi run build-docs` - Build documentation
+- `pixi run serve-docs` - Serve documentation locally
+{% else %}
 The project uses `invoke` for task automation. Here are the main commands:
 
-- `invoke create-environment` - Create a new conda environment
+- `invoke create-environment` - Create a new conda/venv environment
 - `invoke requirements` - Install project requirements
 - `invoke dev-requirements` - Install development requirements
 - `invoke test` - Run tests
 - `invoke build-docs` - Build documentation
 - `invoke serve-docs` - Serve documentation locally
+{% endif %}
 
 ## Project Guidelines
 

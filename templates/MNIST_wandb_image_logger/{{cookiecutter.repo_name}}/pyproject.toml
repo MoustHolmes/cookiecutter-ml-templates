@@ -1,5 +1,5 @@
 [build-system]
-{%- if cookiecutter.deps_manager == 'uv' %}
+{%- if cookiecutter.deps_manager in ['uv', 'pixi'] %}
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 {%- else %}
@@ -54,6 +54,8 @@ dev = [
     "types-requests>=2.31.0",
     "types-setuptools>=69.0.0",
 ]
+{%- elif cookiecutter.deps_manager == 'pixi' %}
+# Dependencies managed by pixi (see pixi.toml)
 {%- else %}
 dynamic = ["dependencies", "optional-dependencies"]
 

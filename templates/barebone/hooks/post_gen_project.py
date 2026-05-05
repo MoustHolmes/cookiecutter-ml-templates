@@ -44,8 +44,8 @@ if not (ge(python_version, min_version) and le(python_version, max_version)):
 
 # Handle dependency manager option
 if deps_manager == "uv":
-    # Remove pip-specific files
-    for file in ["requirements.txt", "requirements_dev.txt", "tasks_pip.py"]:
+    # Remove pip-specific and pixi-specific files
+    for file in ["requirements.txt", "requirements_dev.txt", "tasks_pip.py", "pixi.toml"]:
         file_path = Path(file)
         if file_path.exists():
             os.remove(file_path)
@@ -55,13 +55,20 @@ if deps_manager == "uv":
         os.rename("tasks_uv.py", "tasks.py")
 
 elif deps_manager == "pip":
-    # Remove uv-specific files
-    if Path("tasks_uv.py").exists():
-        os.remove("tasks_uv.py")
+    # Remove uv-specific and pixi-specific files
+    for file in ["tasks_uv.py", "pixi.toml"]:
+        if Path(file).exists():
+            os.remove(file)
 
     # Rename pip tasks
     if Path("tasks_pip.py").exists():
         os.rename("tasks_pip.py", "tasks.py")
+
+elif deps_manager == "pixi":
+    # Remove pip/uv specific files; tasks are defined in pixi.toml
+    for file in ["requirements.txt", "requirements_dev.txt", "tasks_pip.py", "tasks_uv.py", "tasks.py"]:
+        if Path(file).exists():
+            os.remove(file)
 
 # Handle project structure option (after deps_manager to work with the final tasks.py)
 if project_structure == "minimal":
@@ -204,10 +211,15 @@ print(f"\n📁 Location: {Path.cwd()}")
 print("\n🔧 Next steps:")
 print("1. cd", repo_name)
 if deps_manager == "pip":
-    print("2. pip install -r requirements.txt")
-else:
-    print("2. uv pip install -r requirements.txt")
-print("3. pip install -e .")
-print("4. python src/" + repo_name + "/train.py  # Run training")
+    print("2. conda create -n " + repo_name + " python=" + python_version + " && conda activate " + repo_name)
+    print("3. pip install -e '.[dev]'")
+    print("4. python src/" + repo_name + "/train.py  # Run training")
+elif deps_manager == "uv":
+    print("2. uv venv && source .venv/bin/activate  # On Windows: .venv\\Scripts\\activate")
+    print("3. uv pip install -e '.[dev]'")
+    print("4. python src/" + repo_name + "/train.py  # Run training")
+else:  # pixi
+    print("2. pixi install")
+    print("3. pixi run train")
 print("\n📖 Documentation: See README.md for more details")
 print("=" * 80 + "\n")

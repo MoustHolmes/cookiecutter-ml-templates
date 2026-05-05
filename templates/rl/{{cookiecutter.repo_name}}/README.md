@@ -4,9 +4,23 @@
 
 ## Setup
 
+{% if cookiecutter.deps_manager == "pixi" %}
 ```bash
-pip install -e .[dev]
+pixi install
 ```
+{% elif cookiecutter.deps_manager == "uv" %}
+```bash
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+uv pip install -e ".[dev]"
+```
+{% else %}
+```bash
+conda create -n {{cookiecutter.repo_name}} python={{cookiecutter.python_version}}
+conda activate {{cookiecutter.repo_name}}
+pip install -e ".[dev]"
+```
+{% endif %}
 
 ## Training
 

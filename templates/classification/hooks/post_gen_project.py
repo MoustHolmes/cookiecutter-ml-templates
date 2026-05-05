@@ -45,8 +45,8 @@ if include_examples not in ["yes", "no"]:
 
 # Handle dependency manager option
 if deps_manager == "uv":
-    # Remove pip-specific files
-    for file in ["requirements.txt", "requirements_dev.txt", "tasks_pip.py"]:
+    # Remove pip-specific and pixi-specific files
+    for file in ["requirements.txt", "requirements_dev.txt", "tasks_pip.py", "pixi.toml"]:
         if Path(file).exists():
             os.remove(file)
 
@@ -55,11 +55,18 @@ if deps_manager == "uv":
         os.rename("tasks_uv.py", "tasks.py")
 
 elif deps_manager == "pip":
-    # Remove uv-specific files
-    if Path("tasks_uv.py").exists():
-        os.remove("tasks_uv.py")
+    # Remove uv-specific and pixi-specific files
+    for file in ["tasks_uv.py", "pixi.toml"]:
+        if Path(file).exists():
+            os.remove(file)
 
     # Rename pip tasks
     if Path("tasks_pip.py").exists():
         os.rename("tasks_pip.py", "tasks.py")
+
+elif deps_manager == "pixi":
+    # Remove pip/uv specific files; tasks are defined in pixi.toml
+    for file in ["requirements.txt", "requirements_dev.txt", "tasks_pip.py", "tasks_uv.py", "tasks.py"]:
+        if Path(file).exists():
+            os.remove(file)
 

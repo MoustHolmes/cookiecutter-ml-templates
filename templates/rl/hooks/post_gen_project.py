@@ -111,8 +111,8 @@ def main():
 
     # Handle dependency manager option
     if deps_manager == "uv":
-        # Remove pip-specific files
-        for file in ["requirements.txt", "requirements_dev.txt", "tasks_pip.py"]:
+        # Remove pip-specific and pixi-specific files
+        for file in ["requirements.txt", "requirements_dev.txt", "tasks_pip.py", "pixi.toml"]:
             if Path(file).exists():
                 os.remove(file)
 
@@ -121,13 +121,20 @@ def main():
             os.rename("tasks_uv.py", "tasks.py")
 
     elif deps_manager == "pip":
-        # Remove uv-specific files
-        if Path("tasks_uv.py").exists():
-            os.remove("tasks_uv.py")
+        # Remove uv-specific and pixi-specific files
+        for file in ["tasks_uv.py", "pixi.toml"]:
+            if Path(file).exists():
+                os.remove(file)
 
         # Rename pip tasks
         if Path("tasks_pip.py").exists():
             os.rename("tasks_pip.py", "tasks.py")
+
+    elif deps_manager == "pixi":
+        # Remove pip/uv specific files; tasks are defined in pixi.toml
+        for file in ["requirements.txt", "requirements_dev.txt", "tasks_pip.py", "tasks_uv.py", "tasks.py"]:
+            if Path(file).exists():
+                os.remove(file)
 
     if create_github_repo == "yes":
         try:
@@ -143,15 +150,19 @@ def main():
     print("\n🔧 Next steps:")
     print(f"1. cd {repo_name}")
     if deps_manager == "pip":
-        print("2. pip install -e .[dev]")
-        print(f"3. python src/{repo_name}/train.py              # Train SAC on Pendulum")
-        print(f"4. python src/{repo_name}/train.py agent=td3    # Train TD3 instead")
-    else:
-        print("2. uv venv")
-        print("3. source .venv/bin/activate")
-        print("4. uv pip install -e .[dev]")
-        print(f"5. python src/{repo_name}/train.py              # Train SAC on Pendulum")
-        print(f"6. python src/{repo_name}/train.py agent=td3    # Train TD3 instead")
+        print(f"2. conda create -n {repo_name} python=<version> && conda activate {repo_name}")
+        print("3. pip install -e '.[dev]'")
+        print(f"4. python src/{repo_name}/train.py              # Train SAC on Pendulum")
+        print(f"5. python src/{repo_name}/train.py agent=td3    # Train TD3 instead")
+    elif deps_manager == "uv":
+        print("2. uv venv && source .venv/bin/activate  # On Windows: .venv\\Scripts\\activate")
+        print("3. uv pip install -e '.[dev]'")
+        print(f"4. python src/{repo_name}/train.py              # Train SAC on Pendulum")
+        print(f"5. python src/{repo_name}/train.py agent=td3    # Train TD3 instead")
+    else:  # pixi
+        print("2. pixi install")
+        print("3. pixi run train-sac                          # Train SAC on Pendulum")
+        print("4. pixi run train-td3                          # Train TD3 instead")
     print("\n📖 Documentation: See README.md for more details")
     print("=" * 80 + "\n")
 
