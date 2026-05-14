@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class BarebonesLightningModule(L.LightningModule):
+class ClassificationModule(L.LightningModule):
     def __init__(
         self,
         hidden_size: int = 64,

@@ -35,19 +35,18 @@ This is a mono-repo of [Cookiecutter](https://cookiecutter.readthedocs.io/) temp
 
 ### Templates
 
-Each template lives in `templates/<name>/` with this structure:
+Templates are organized into category subdirectories. Each template directory contains:
 - `cookiecutter.json` — prompts/defaults presented to the user during generation
 - `hooks/post_gen_project.py` — runs after generation to handle conditional file removal/renaming and optional GitHub repo creation
 - `{{cookiecutter.repo_name}}/` — the generated project skeleton (Jinja2-templated)
 
 Available templates:
-- `barebone` — gold-standard minimal template; used as reference structure for tests
-- `classification` — barebone configured for classification tasks
-- `flow_matching` — full flow matching implementation (PyTorch Lightning + Hydra); the most complete supervised-learning template
-- `rl` — reinforcement learning template with SAC, TD3, PPO (discrete + continuous), RPO, and DQN; uses Gymnasium environments; has its own `hooks/post_gen_project.py`
-- `MNIST_wandb_image_logger` — MNIST example with W&B image logging
+- `templates/barebone/` — gold-standard minimal template; lives at root (not in a category); used as reference structure for tests
+- `templates/core/classification/` — MNIST image classification (ClassificationModule + MNISTDataModule + Hydra configs)
+- `templates/generative/flow_matching/` — full flow matching implementation (PyTorch Lightning + Hydra); the most complete template
+- `templates/rl/` — reinforcement learning with SAC, TD3, PPO (discrete + continuous), RPO, and DQN; uses Gymnasium; has its own `hooks/post_gen_project.py`
 
-The top-level `hooks/post_gen_project.py` is a shared hook used by simpler templates (e.g., `classification`).
+See `TEMPLATE_ROADMAP.md` for the full planned directory layout including all future templates.
 
 ### Key template options (cookiecutter.json)
 
@@ -168,15 +167,16 @@ Pick the most structurally similar existing template:
 
 | New template type | Best donor |
 |---|---|
-| Supervised learning | `barebone` or `flow_matching` |
-| Classification/regression | `classification` |
-| RL agent | `rl` |
-| Logging / quick demo | `MNIST_wandb_image_logger` |
+| Supervised learning (core/) | `templates/barebone` or `templates/generative/flow_matching` |
+| Classification/regression | `templates/core/classification` |
+| Generative model | `templates/generative/flow_matching` |
+| RL agent | `templates/rl` |
 
 ### 2. Copy donor to test_temp/
 
 ```bash
-cp -r templates/<donor> test_temp/<new_template>
+cp -r templates/<category>/<donor> test_temp/<new_template>
+# e.g. cp -r templates/core/classification test_temp/segmentation
 ```
 
 The template dir contains only: `cookiecutter.json`, `hooks/`, `{{cookiecutter.repo_name}}/` — no generated output.
@@ -229,8 +229,9 @@ When the template is working, copy it across. A template directory is identifiab
 # Safety check: confirm this is a template, not a generated project
 ls test_temp/<new_template>/cookiecutter.json
 
-# Transfer
-cp -r test_temp/<new_template> templates/<new_template>
+# Transfer to the appropriate category directory
+cp -r test_temp/<new_template> templates/<category>/<new_template>
+# e.g. cp -r test_temp/segmentation templates/core/segmentation
 ```
 
 The template dir is clean (no `.venv`, `.pixi`, `__pycache__` — those only appear in generated output dirs). A plain `cp -r` is safe.
@@ -242,7 +243,7 @@ Add to `tests/test_create_project.py` (follow the existing pattern):
 ```python
 def test_<new_template>_structure(temp_dir: Path) -> None:
     """Assert expected files exist after generation."""
-    template_dir = (Path(__file__).parent / ".." / "templates" / "<new_template>").resolve()
+    template_dir = (Path(__file__).parent / ".." / "templates" / "<category>" / "<new_template>").resolve()
     cookiecutter(
         template=str(template_dir),
         output_dir=str(temp_dir),

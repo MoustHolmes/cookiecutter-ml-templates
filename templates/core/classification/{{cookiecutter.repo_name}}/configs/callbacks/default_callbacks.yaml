@@ -15,8 +15,3 @@ early_stopping:
   patience: 3  # how many epochs of not improving until training stops
   min_delta: 0.0  # minimum change in the monitored metric to qualify as an improvement
   verbose: false
-
-image_logger:
-  _target_: {{cookiecutter.project_name}}.callbacks.image_logger.ImageLoggerCallback
-  log_every_n_batches: 50  # Log images every 50 batches
-  num_samples: 8  # Number of images to log each time

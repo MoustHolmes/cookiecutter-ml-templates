@@ -8,6 +8,77 @@ Inspiration sources: `inspiration_code/lightning-bolts/`, `inspiration_code/ligh
 
 ---
 
+## Template Infrastructure
+
+Architectural improvements to the repo itself — not new ML templates.
+
+### Template Directory Layout
+
+All templates — existing (✅) and planned — mapped to their final locations.
+
+```
+templates/
+  barebone/                       # ✅ root — gold standard reference
+
+  core/                           # standard supervised learning
+    classification/               # ✅ MNIST image classification (MNISTDataModule + ClassificationModule)
+    segmentation/                 # 🔲 Tier 1 — U-Net, Dice loss, mIoU
+    object_detection/             # 🔲 Tier 2 — Faster R-CNN / RetinaNet, mAP
+    regression/                   # 🔲 Tier 2 — MLP on tabular data, R²
+
+  generative/                     # generative models
+    flow_matching/                # ✅ ODE-based flow matching (UNet denoiser, EulerSolver)
+    vae/                          # 🔲 Tier 1 — ELBO loss, reparameterization, KL annealing
+    diffusion/                    # 🔲 Tier 2 — DDPM/DDIM, noise schedule, reverse process
+    gan/                          # 🔲 Tier 3 — DCGAN, two-optimizer training, FID
+    super_resolution/             # 🔲 Tier 3 — SRGAN, perceptual loss, PSNR/SSIM
+
+  rl/                             # reinforcement learning
+    sac/                          # 🔲 split from monolithic rl — continuous actions, twin critics
+    td3/                          # 🔲 split from monolithic rl — continuous actions, delayed policy update
+    ppo/                          # 🔲 split from monolithic rl — on-policy, discrete + continuous
+    dqn/                          # 🔲 split from monolithic rl — discrete actions, experience replay
+
+  self_supervised/                # self-supervised learning
+    contrastive_ssl/              # 🔲 Tier 1 — SimCLR / BYOL / SimSiam, NT-Xent, linear probe
+
+  nlp/                            # natural language processing
+    text_classification/          # 🔲 Tier 1 — HuggingFace backbone, BERT/RoBERTa, F1
+    nano_lm/                      # 🔲 Tier 2 — GPT from scratch, causal LM, BPE/char tokenizer
+
+  time_series/                    # sequential data
+    forecasting/                  # 🔲 Tier 2 — TCN/Transformer, sliding window, SMAPE
+
+  audio/                          # audio processing
+    classification/               # 🔲 Tier 3 — Mel spectrogram, CNN, torchaudio
+
+  graph/                          # graph neural networks
+    classification/               # 🔲 Tier 3 — GCN/GAT, PyTorch Geometric, graph pooling
+```
+
+**RL split note:** The monolithic `rl/` template currently lives at `templates/rl/`. When it is split into per-algorithm templates, the subdirectories will be created inside `templates/rl/` — no further top-level restructuring needed.
+
+### Copier Migration (explore on branch)
+Cookiecutter has no native template inheritance or update mechanism. [Copier](https://copier.readthedocs.io/) supports both via `_inherit_from` and `copier update`.
+
+**Why it matters:** Extensions (image logger, gradio, HuggingFace page) cannot be cleanly composed onto an existing cookiecutter-generated project. Copier solves this natively.
+
+**Work:** Create a branch, migrate `barebone` to Copier, validate the pattern, then decide whether to migrate everything.
+
+### Extensions (post-Copier migration)
+Add-ons that layer on top of a generated project. Each extension is a Copier template that `_inherit_from` the relevant base template.
+
+Planned extensions (in rough priority order):
+
+| Extension | Description | Base template |
+|---|---|---|
+| `wandb_image_logger` | Log prediction images to W&B every N batches | `classification` |
+| `wandb_artifacts` | Log model checkpoints and datasets as W&B Artifacts | any |
+| `gradio_app` | Interactive inference demo with Gradio | any |
+| `huggingface_page` | Push model to HF Hub + model card | any |
+
+---
+
 ## Tier 1 — High Priority
 
 ### `vae` — Variational Autoencoder

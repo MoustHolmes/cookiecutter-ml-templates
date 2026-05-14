@@ -1,16 +1,16 @@
 import pytest
 import torch
-from {{cookiecutter.repo_name}}.barebones_lightningmodule import BarebonesLightningModule
+from {{cookiecutter.repo_name}}.classification_module import ClassificationModule
 
 
 @pytest.fixture
 def model():
-    return BarebonesLightningModule(hidden_size=64, learning_rate=1e-3)
+    return ClassificationModule(hidden_size=64, learning_rate=1e-3)
 
 
 def test_model_init(model):
     """Test if the model initializes correctly."""
-    assert isinstance(model, BarebonesLightningModule)
+    assert isinstance(model, ClassificationModule)
     assert model.hparams.hidden_size == 64
     assert model.hparams.learning_rate == 1e-3
 

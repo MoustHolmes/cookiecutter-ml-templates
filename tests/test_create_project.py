@@ -155,7 +155,7 @@ def test_classification_template_success(temp_dir: Path) -> None:
     """
     output_dir = temp_dir / "classification_test"
     current_dir = Path(__file__).parent
-    template_dir = (current_dir / ".." / "templates" / "classification").resolve()
+    template_dir = (current_dir / ".." / "templates" / "core" / "classification").resolve()
 
     # Generate project
     cookiecutter(
@@ -170,14 +170,15 @@ def test_classification_template_success(temp_dir: Path) -> None:
         },
     )
 
-    # Check if critical files and directories exist
     generated_dir = output_dir / "test_classification"
-    # We use pytest's assert since this is a test file
     assert generated_dir.exists()
-    assert (generated_dir / "src").exists()
-    assert (generated_dir / "tests").exists()
-    assert (generated_dir / "configs").exists()
-    assert (generated_dir / "data").exists()
+    assert (generated_dir / "src" / "test_classification" / "classification_module.py").exists()
+    assert (generated_dir / "src" / "test_classification" / "data" / "mnist_datamodule.py").exists()
+    assert (generated_dir / "src" / "test_classification" / "callbacks" / "__init__.py").exists()
+    assert (generated_dir / "configs" / "train_config.yaml").exists()
+    assert (generated_dir / "configs" / "callbacks" / "default_callbacks.yaml").exists()
+    assert (generated_dir / "tests" / "test_model.py").exists()
+    assert (generated_dir / "tests" / "test_data.py").exists()
     assert (generated_dir / "pyproject.toml").exists()
 
 
@@ -261,49 +262,6 @@ def test_project_structure(temp_dir: Path) -> None:
     assert (generated_dir / ".gitignore").exists()
     assert (generated_dir / ".pre-commit-config.yaml").exists()
     assert (generated_dir / "LICENSE").exists()
-
-
-def test_mnist_wandb_image_logger_template_success(temp_dir: Path) -> None:
-    """Test successful generation of MNIST_wandb_image_logger template.
-
-    Args:
-        temp_dir: temporary directory for test
-    """
-    output_dir = temp_dir / "mnist_wandb_test"
-    current_dir = Path(__file__).parent
-    template_dir = (current_dir / ".." / "templates" / "MNIST_wandb_image_logger").resolve()
-
-    # Generate project
-    cookiecutter(
-        template=str(template_dir),
-        output_dir=str(output_dir),
-        no_input=True,
-        extra_context={
-            "project_name": "test_mnist_wandb",
-            "author_name": "Test Author",
-            "description": "Test MNIST WandB Image Logger",
-            "python_version": "3.12",
-            "open_source_license": "MIT",
-        },
-    )
-
-    # Check if critical files and directories exist
-    generated_dir = output_dir / "test_mnist_wandb"
-    assert generated_dir.exists()
-    assert (generated_dir / "src").exists()
-    assert (generated_dir / "tests").exists()
-    assert (generated_dir / "configs").exists()
-    assert (generated_dir / "data").exists()
-    assert (generated_dir / "docs").exists()
-    assert (generated_dir / "notebooks").exists()
-    assert (generated_dir / "logs").exists()
-    assert (generated_dir / "outputs").exists()
-    assert (generated_dir / "LICENSE").exists()
-    assert (generated_dir / "pyproject.toml").exists()
-    assert (generated_dir / "README.md").exists()
-    assert (generated_dir / "requirements.txt").exists()
-    assert (generated_dir / "requirements_dev.txt").exists()
-    assert (generated_dir / "tasks.py").exists()
 
 
 def test_barebone_minimal_structure(temp_dir: Path) -> None:
@@ -477,7 +435,7 @@ def test_classification_with_uv_deps_manager(temp_dir: Path) -> None:
     """
     output_dir = temp_dir / "classification_uv_test"
     current_dir = Path(__file__).parent
-    template_dir = (current_dir / ".." / "templates" / "classification").resolve()
+    template_dir = (current_dir / ".." / "templates" / "core" / "classification").resolve()
 
     # Generate project with UV dependency manager
     cookiecutter(
@@ -532,7 +490,7 @@ def test_flow_matching_with_uv_deps_manager(temp_dir: Path) -> None:
     """
     output_dir = temp_dir / "flow_matching_uv_test"
     current_dir = Path(__file__).parent
-    template_dir = (current_dir / ".." / "templates" / "flow_matching").resolve()
+    template_dir = (current_dir / ".." / "templates" / "generative" / "flow_matching").resolve()
 
     # Generate project with UV dependency manager
     cookiecutter(
@@ -549,62 +507,6 @@ def test_flow_matching_with_uv_deps_manager(temp_dir: Path) -> None:
     )
 
     generated_dir = output_dir / "test_flow_uv"
-    assert generated_dir.exists()
-
-    # Check that requirements files do NOT exist
-    assert not (generated_dir / "requirements.txt").exists()
-    assert not (generated_dir / "requirements_dev.txt").exists()
-
-    # Check that pyproject.toml exists with dependencies
-    pyproject_file = generated_dir / "pyproject.toml"
-    assert pyproject_file.exists()
-
-    with pyproject_file.open("r") as f:
-        pyproject_content = f.read()
-
-    # Verify it's the UV version with inline dependencies
-    assert "dependencies = [" in pyproject_content
-    assert "[project.optional-dependencies]" in pyproject_content
-    assert "dev = [" in pyproject_content
-
-    # Check that tasks.py uses uv run commands
-    tasks_file = generated_dir / "tasks.py"
-    assert tasks_file.exists()
-
-    with tasks_file.open("r") as f:
-        tasks_content = f.read()
-
-    # Verify uv run commands are present
-    assert "uv run" in tasks_content
-    assert "uv pip install" in tasks_content
-
-
-def test_mnist_wandb_with_uv_deps_manager(temp_dir: Path) -> None:
-    """Test generation of MNIST_wandb_image_logger template with UV dependency manager.
-
-    Args:
-        temp_dir: temporary directory for test
-    """
-    output_dir = temp_dir / "mnist_wandb_uv_test"
-    current_dir = Path(__file__).parent
-    template_dir = (current_dir / ".." / "templates" / "MNIST_wandb_image_logger").resolve()
-
-    # Generate project with UV dependency manager
-    cookiecutter(
-        template=str(template_dir),
-        output_dir=str(output_dir),
-        no_input=True,
-        extra_context={
-            "project_name": "test_mnist_uv",
-            "author_name": "Test Author",
-            "description": "Test UV Dependency Manager",
-            "python_version": "3.12",
-            "deps_manager": "uv",
-            "open_source_license": "MIT",
-        },
-    )
-
-    generated_dir = output_dir / "test_mnist_uv"
     assert generated_dir.exists()
 
     # Check that requirements files do NOT exist
@@ -697,7 +599,7 @@ def test_rl_template_structure(temp_dir: Path) -> None:
         assert (src / module).exists(), f"Missing {module}"
 
     # Model classes
-    for model_file in ("actor.py", "critic.py", "ppo_agent.py", "qnetwork.py"):
+    for model_file in ("actor.py", "critic.py", "mlp.py"):
         assert (src / "models" / model_file).exists(), f"Missing models/{model_file}"
 
     # Data classes
@@ -955,7 +857,7 @@ def test_flow_matching_template_internal_tests(temp_dir: Path) -> None:
 
     output_dir = temp_dir / "flow_matching_integration"
     current_dir = Path(__file__).parent
-    template_dir = (current_dir / ".." / "templates" / "flow_matching").resolve()
+    template_dir = (current_dir / ".." / "templates" / "generative" / "flow_matching").resolve()
 
     # Generate project
     cookiecutter(
@@ -993,79 +895,6 @@ def test_flow_matching_template_internal_tests(temp_dir: Path) -> None:
     # Run the generated project's tests
     test_result = subprocess.run(
         ["pytest", "tests/", "-v", "--tb=short"],
-        cwd=generated_dir,
-        capture_output=True,
-        text=True,
-        timeout=120,  # 2 minute timeout for tests
-    )
-
-    # Check if tests passed
-    if test_result.returncode != 0:
-        pytest.fail(
-            f"Generated project's tests failed:\n"
-            f"stdout: {test_result.stdout}\n"
-            f"stderr: {test_result.stderr}",
-        )
-
-    # Assert that we actually ran some tests
-    assert "passed" in test_result.stdout.lower() or "passed" in test_result.stderr.lower()
-
-
-@pytest.mark.slow
-def test_mnist_wandb_template_internal_tests(temp_dir: Path) -> None:
-    """Test that the generated MNIST_wandb_image_logger template's internal tests pass.
-
-    This is an integration test that:
-    1. Generates a project from the template
-    2. Installs its dependencies
-    3. Runs the generated project's test suite
-
-    Args:
-        temp_dir: temporary directory for test
-    """
-    import subprocess
-
-    output_dir = temp_dir / "mnist_wandb_integration"
-    current_dir = Path(__file__).parent
-    template_dir = (current_dir / ".." / "templates" / "MNIST_wandb_image_logger").resolve()
-
-    # Generate project
-    cookiecutter(
-        template=str(template_dir),
-        output_dir=str(output_dir),
-        no_input=True,
-        extra_context={
-            "project_name": "test_mnist_wandb_internal",
-            "author_name": "Test Author",
-            "description": "Test MNIST WandB Internal Tests",
-            "python_version": "3.12",
-            "open_source_license": "MIT",
-        },
-    )
-
-    generated_dir = output_dir / "test_mnist_wandb_internal"
-    assert generated_dir.exists()
-
-    # Install dependencies (in editable mode with dev dependencies)
-    install_result = subprocess.run(
-        ["pip", "install", "-e", ".[dev]"],
-        cwd=generated_dir,
-        capture_output=True,
-        text=True,
-        timeout=300,  # 5 minute timeout for installation
-    )
-
-    # Check if installation succeeded
-    if install_result.returncode != 0:
-        pytest.fail(
-            f"Failed to install dependencies:\n"
-            f"stdout: {install_result.stdout}\n"
-            f"stderr: {install_result.stderr}",
-        )
-
-    # Run the generated project's tests
-    test_result = subprocess.run(
-        ["pytest", "tests/", "-v"],
         cwd=generated_dir,
         capture_output=True,
         text=True,

@@ -7,9 +7,8 @@ from operator import ge, le
 
 project_name = "{{cookiecutter.project_name}}"
 python_version = "{{cookiecutter.python_version}}"
-use_wandb = "{{cookiecutter.use_wandb}}"
-include_examples = "{{cookiecutter.include_examples}}"
 deps_manager = "{{cookiecutter.deps_manager}}"
+open_source_license = "{{cookiecutter.open_source_license}}"
 
 # Project name validation
 if not project_name.isidentifier() or not project_name.islower():
@@ -34,39 +33,27 @@ if not (ge(python_version, min_version) and le(python_version, max_version)):
     )
     raise ValueError(msg)
 
-# Validate wandb and examples choices
-if use_wandb not in ["yes", "no"]:
-    msg = "use_wandb must be either 'yes' or 'no'"
-    raise ValueError(msg)
-
-if include_examples not in ["yes", "no"]:
-    msg = "include_examples must be either 'yes' or 'no'"
-    raise ValueError(msg)
+# Remove license file if not requested
+if open_source_license == "No license file":
+    if Path("LICENSE").exists():
+        os.remove("LICENSE")
 
 # Handle dependency manager option
 if deps_manager == "uv":
-    # Remove pip-specific and pixi-specific files
     for file in ["requirements.txt", "requirements_dev.txt", "tasks_pip.py", "pixi.toml"]:
         if Path(file).exists():
             os.remove(file)
-
-    # Rename uv tasks
     if Path("tasks_uv.py").exists():
         os.rename("tasks_uv.py", "tasks.py")
 
 elif deps_manager == "pip":
-    # Remove uv-specific and pixi-specific files
     for file in ["tasks_uv.py", "pixi.toml"]:
         if Path(file).exists():
             os.remove(file)
-
-    # Rename pip tasks
     if Path("tasks_pip.py").exists():
         os.rename("tasks_pip.py", "tasks.py")
 
 elif deps_manager == "pixi":
-    # Remove pip/uv specific files; tasks are defined in pixi.toml
     for file in ["requirements.txt", "requirements_dev.txt", "tasks_pip.py", "tasks_uv.py", "tasks.py"]:
         if Path(file).exists():
             os.remove(file)
-

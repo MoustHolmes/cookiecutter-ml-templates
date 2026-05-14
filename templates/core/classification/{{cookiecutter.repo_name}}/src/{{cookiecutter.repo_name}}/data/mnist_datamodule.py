@@ -7,7 +7,7 @@ from torchvision import transforms
 from torchvision.datasets import MNIST
 
 
-class BarebonesDataModule(L.LightningDataModule):
+class MNISTDataModule(L.LightningDataModule):
     def __init__(
         self,
         data_dir: str = "data/",

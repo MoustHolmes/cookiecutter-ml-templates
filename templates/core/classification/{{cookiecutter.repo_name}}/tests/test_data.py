@@ -4,7 +4,7 @@ import pytest
 import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from {{cookiecutter.repo_name}}.data.barebones_datamodule import BarebonesDataModule
+from {{cookiecutter.repo_name}}.data.mnist_datamodule import MNISTDataModule
 
 
 @pytest.fixture
@@ -14,7 +14,7 @@ def data_dir(tmp_path):
 
 @pytest.fixture
 def datamodule(data_dir):
-    return BarebonesDataModule(
+    return MNISTDataModule(
         data_dir=data_dir,
         batch_size=32,
         num_workers=0,
