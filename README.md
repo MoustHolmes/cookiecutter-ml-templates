@@ -27,9 +27,8 @@ Developing Machine Learning models often involves repetitive setup and boilerpla
 * **Modern Tech Stack:** Built upon PyTorch, PyTorch Lightning (for structure and features like Callbacks, distributed training), and Hydra (for powerful configuration).
 * **Developer Experience:** Integrates standard tooling like Ruff, Black, pre-commit, Pytest, and Invoke for code quality, consistency, and task automation.
 * **Comprehensive Documentation:** Using MkDocs Material for clear, searchable, and extensive documentation beyond simple API references.
-* **MLOps Integrations (Planned/Included):**
+* **MLOps Integrations:**
     * Logging: Weights & Biases (W&B) integration, including Model Registry and Artifacts for datasets/predictions.
-    * Launchers: Support for local execution, Docker, and planned integration with cloud platforms (GCP Vertex AI) and potentially cluster schedulers (SLURM).
     * Testing: Robust unit and integration testing structure within each template.
 
 ## Technology Stack
