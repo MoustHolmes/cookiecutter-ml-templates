@@ -1,85 +1,65 @@
 # Quick Start
 
-Get up and running with Cookiecutter ML Templates in minutes!
+Get a project running from a template in a few minutes.
 
 ## Prerequisites
 
 - Python 3.10 or higher
-- pip or conda package manager
-- Git (for cloning from GitHub)
-
-## Installation
-
-### Install Cookiecutter
-
-=== "pip"
-    ```bash
-    pip install cookiecutter
-    ```
-
-=== "conda"
-    ```bash
-    conda install -c conda-forge cookiecutter
-    ```
-
-=== "pipx (recommended)"
-    ```bash
-    pipx install cookiecutter
-    ```
-
-!!! tip "Why pipx?"
-    `pipx` installs packages in isolated environments, preventing dependency conflicts. Perfect for CLI tools like cookiecutter!
+- Git
+- Copier (`pip install copier`)
 
 ## Create Your First Project
 
-### 1. Choose a Template
+### 1. Make the project directory
+
+Templates are flat — you create the directory first, then copy the template into it.
+
+```bash
+mkdir my_project && cd my_project
+```
+
+### 2. Choose a template and run copier
 
 Start with the **barebone** template for maximum flexibility:
 
 ```bash
-cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/barebone
+copier copy gh:MoustHolmes/cookiecutter-ml-templates/templates/barebone . --trust
 ```
 
-Or use the **flow matching** template for a complete example:
+Or use the **flow matching** template for a complete generative model example:
 
 ```bash
-cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/flow_matching
+copier copy gh:MoustHolmes/cookiecutter-ml-templates/templates/generative/flow_matching . --trust
 ```
 
-### 2. Answer the Prompts
-
-You'll be asked to configure your project:
+### 3. Answer the prompts
 
 ```plaintext
-repo_name [my_ml_project]: awesome_classifier
+project_name [my_project]: awesome_classifier
 author_name [Your Name]: Jane Doe
-author_email [your.email@example.com]: jane@example.com
-python_version [3.10]: 3.10
-project_structure [full]: full
+author_email [your@email.com]: jane@example.com
+python_version [3.12]: 3.12
 deps_manager [pip]: uv
+project_structure [full]: full
 ```
 
-!!! info "Template Options"
-    - **project_structure**: `full` includes docs, `minimal` excludes them
-    - **deps_manager**: Choose between `pip` or `uv` for dependency management
+!!! info "Template options"
+    - **`project_structure`**: `full` includes a `docs/` directory with MkDocs setup; `minimal` removes it.
+    - **`deps_manager`**: `pip`, `uv`, or `pixi` — controls which dependency files are generated.
 
-### 3. Navigate to Your Project
+Copier writes all files directly into the current directory and saves your answers to `.copier-answers.yml`.
 
-```bash
-cd awesome_classifier
-```
-
-### 4. Set Up the Environment
+### 4. Set up the environment
 
 === "pip"
     ```bash
-    python -m venv venv
-    source venv/bin/activate  # On Windows: venv\Scripts\activate
+    python -m venv .venv
+    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
     pip install -r requirements.txt
     pip install -e .
     ```
 
-=== "uv (faster!)"
+=== "uv"
     ```bash
     uv venv
     source .venv/bin/activate  # On Windows: .venv\Scripts\activate
@@ -87,72 +67,77 @@ cd awesome_classifier
     uv pip install -e .
     ```
 
-### 5. Run the Tests
+=== "pixi"
+    ```bash
+    pixi install
+    ```
 
-Verify everything works:
+### 5. Run the tests
 
 ```bash
 pytest tests/
 ```
 
-You should see all tests passing! ✅
-
-### 6. Start Training
-
-Run a training example:
+### 6. Start training
 
 ```bash
 python src/awesome_classifier/train.py
 ```
 
-## What's Included?
-
-Your generated project contains:
+## What's in the generated project
 
 ```
 awesome_classifier/
 ├── configs/              # Hydra configuration files
 │   ├── train_config.yaml
-│   ├── data/            # Data module configs
-│   ├── model/           # Model configs
-│   └── trainer/         # Trainer configs
-├── src/                 # Source code
+│   ├── data/
+│   ├── model/
+│   └── trainer/
+├── src/
 │   └── awesome_classifier/
-│       ├── train.py     # Training script
+│       ├── train.py     # Hydra entry point
 │       └── ...
-├── tests/               # Unit tests
-├── data/                # Data directory
-├── notebooks/           # Jupyter notebooks
-├── docs/                # Documentation (if full structure)
-└── pyproject.toml       # Project metadata
+├── tests/
+├── data/
+├── notebooks/
+├── docs/                # Only present if project_structure=full
+├── pyproject.toml
+└── .copier-answers.yml  # Saved answers for copier update
 ```
+
+## Updating your project later
+
+When the template releases improvements, pull them into your existing project:
+
+```bash
+copier update --trust
+```
+
+Copier re-runs the questions (defaulting to your saved answers) and merges changes into your project.
 
 ## Next Steps
 
-Now that you have a project running:
-
-1. **[Customize Configuration](../guides/hydra-config.md)** - Learn how to use Hydra
-2. **[Add Your Data](../guides/project-structure.md)** - Set up your datasets
-3. **[Implement Your Model](../guides/project-structure.md)** - Create your architecture
-4. **[Write Tests](../guides/testing.md)** - Ensure code quality
+1. **[Customize Configuration](../guides/hydra-config.md)** — learn Hydra config groups and overrides
+2. **[Add Your Data](../guides/project-structure.md)** — set up your datasets
+3. **[Write Tests](../guides/testing.md)** — keep the test suite green
 
 ## Common Issues
 
-!!! warning "Import Errors"
-    If you get import errors, make sure you installed the package in editable mode:
+!!! warning "Import errors"
+    Make sure you installed the package in editable mode:
     ```bash
     pip install -e .
     ```
 
-!!! warning "Hydra Config Errors"
-    If Hydra can't find configs, ensure you're running from the project root:
+!!! warning "Hydra config errors"
+    Run from the project root so Hydra can resolve config paths:
     ```bash
-    cd awesome_classifier
-    python src/awesome_classifier/train.py
+    cd my_project
+    python src/my_project/train.py
     ```
 
 ## Getting Help
 
-- 📖 Browse the [Template Documentation](../available-templates/overview.md)
-- 💬 Check the [FAQ](../reference/faq.md)
-- 🐛 Report issues on [GitHub](https://github.com/MoustHolmes/cookiecutter-ml-templates/issues)
+- Browse the [Template Documentation](../available-templates/overview.md)
+- Check the [FAQ](../reference/faq.md)
+- Report issues on [GitHub](https://github.com/MoustHolmes/cookiecutter-ml-templates/issues)

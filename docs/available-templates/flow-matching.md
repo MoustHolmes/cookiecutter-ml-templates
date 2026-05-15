@@ -8,11 +8,19 @@ Complete flow matching implementation for generative modeling.
 - Various samplers (Gaussian, Uniform)
 - ODE solvers (Euler, RK4)
 - Pre-configured experiments
+- Example notebooks
 
 ## Usage
 
 ```bash
-cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/flow_matching
+mkdir my_project && cd my_project
+copier copy gh:MoustHolmes/cookiecutter-ml-templates/templates/generative/flow_matching . --trust
 ```
 
-Full documentation coming soon!
+## Updating
+
+```bash
+copier update --trust
+```
+
+Full documentation coming soon.

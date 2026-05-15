@@ -1,0 +1,31 @@
+_target_: {{repo_name}}.dqn_module.DQNModule
+
+# Q-network — input_dim / output_dim injected by the env config
+q_network:
+  _target_: {{repo_name}}.models.MLP
+  input_dim: ???
+  output_dim: ???
+  hidden_dim: 128
+  num_layers: 2
+
+# DQN hyperparameters
+gamma: 0.99
+tau: 1.0                  # 1.0 = hard target update
+batch_size: 128
+learning_starts: 10000
+
+# Update schedule
+train_frequency: 10
+target_network_frequency: 500
+
+# Epsilon-greedy exploration
+start_epsilon: 1.0
+end_epsilon: 0.05
+exploration_fraction: 0.5
+
+total_timesteps: 500000
+
+optimizer:
+  _target_: torch.optim.Adam
+  _partial_: true
+  lr: 1.0e-4

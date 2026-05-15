@@ -1,7 +1,7 @@
 # GitHub Copilot Custom Instructions
 
 ## Project Philosophy
-This is a bare bones machine learning project template created using cookiecutter, focused on establishing well-structured machine learning projects with minimal initial code. The template emphasizes best practices, modern tooling, and clean project organization.
+This is a bare bones machine learning project template generated with Copier, focused on establishing well-structured machine learning projects with minimal initial code. The template emphasizes best practices, modern tooling, and clean project organization.
 
 ## Code Style & Structure
 - Follow test-driven development: Write unit tests for all critical components (datasets, models, training loops)

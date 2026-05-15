@@ -2,47 +2,40 @@
 
 ## Requirements
 
-Before installing Cookiecutter ML Templates, ensure you have:
-
 - **Python 3.10 or higher**
-- **pip** or **conda** package manager
-- **Git** (for cloning repositories)
+- **Git**
 
-## Install Cookiecutter
+## Install Copier
 
-Choose your preferred method:
+=== "pip"
+    ```bash
+    pip install copier
+    ```
 
-=== "pipx (Recommended)"
+=== "pipx (isolated)"
     ```bash
     # Install pipx if you don't have it
     python -m pip install --user pipx
     python -m pipx ensurepath
-    
-    # Install cookiecutter
-    pipx install cookiecutter
+
+    # Install copier
+    pipx install copier
     ```
-    
+
     !!! tip "Why pipx?"
-        pipx installs packages in isolated environments, perfect for CLI tools!
+        pipx installs CLI tools in isolated environments, keeping your global Python clean.
 
-=== "pip"
+=== "uv"
     ```bash
-    pip install cookiecutter
-    ```
-
-=== "conda"
-    ```bash
-    conda install -c conda-forge cookiecutter
+    uv tool install copier
     ```
 
 ## Verify Installation
 
 ```bash
-cookiecutter --version
+copier --version
 ```
-
-You should see something like: `Cookiecutter 2.x.x`
 
 ## Next Steps
 
-Ready to create your first project? Head to the [Quick Start Guide](quickstart.md)!
+Ready to create your first project? Head to the [Quick Start Guide](quickstart.md).

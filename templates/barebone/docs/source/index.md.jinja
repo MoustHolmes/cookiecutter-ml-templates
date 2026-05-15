@@ -1,0 +1,50 @@
+# {{ repo_name }}
+
+{{ description }}
+
+## Project Overview
+
+This project follows the ML Ops template structure for maintainable and reproducible machine learning projects.
+
+## Project Structure
+
+```
+├── configs/          # Hydra configuration files
+├── data/
+│   ├── processed/   # Processed data
+│   └── raw/         # Raw data
+├── docs/            # Documentation
+├── notebooks/       # Jupyter notebooks
+├── reports/         # Generated reports and figures
+│   └── figures/
+├── src/             # Source code
+│   └── {{ repo_name }}/
+├── tests/           # Unit tests
+└── tasks.py         # Automation tasks
+```
+
+## Getting Started
+
+1. Install dependencies:
+```bash
+pip install -e ".[dev]"
+```
+
+2. Initialize pre-commit hooks:
+```bash
+pre-commit install
+```
+
+3. Run tests:
+```bash
+pytest tests/
+```
+
+## Development Workflow
+
+The project uses `invoke` for task automation. Main commands:
+
+- `invoke train` - Run training
+- `invoke test` - Run tests
+- `invoke build-docs` - Build documentation
+- `invoke serve-docs` - Serve documentation locally

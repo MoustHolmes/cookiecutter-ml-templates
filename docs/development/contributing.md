@@ -1,6 +1,6 @@
 # Contributing
 
-We welcome contributions! This guide will help you get started.
+We welcome contributions. This guide covers the mechanics.
 
 ## Getting Started
 
@@ -23,7 +23,7 @@ pip install -r requirements.txt
 
 ```bash
 # Fast tests only
-pytest tests/
+pytest tests/ -m "not slow"
 
 # All tests including integration
 pytest tests/ -m slow
@@ -32,8 +32,7 @@ pytest tests/ -m slow
 ## Code Style
 
 We use:
-- **Ruff** for linting
-- **Black** for formatting
+- **Ruff** for linting and formatting
 - **pre-commit** hooks
 
 Install pre-commit hooks:
@@ -44,20 +43,23 @@ pre-commit install
 
 ## Adding a New Template
 
-1. Create template directory in `templates/`
-2. Add cookiecutter.json
-3. Add tests in `tests/test_create_project.py`
-4. Add documentation
-5. Run integration tests
+1. Create the template directory under `templates/`
+2. Add `copier.yml` with questions and validation
+3. Add the flat project skeleton (no outer `{{project_name}}/` wrapper)
+4. Add tests in `tests/test_create_project.py`
+5. Add documentation in `docs/available-templates/`
+6. Run integration tests
+
+See [Creating Templates](creating-templates.md) for the full workflow.
 
 ## Pull Request Process
 
 1. Update tests
 2. Update documentation
-3. Ensure all tests pass
+3. Ensure all tests pass (`pytest tests/ -m "not slow"`)
 4. Update CHANGELOG (if applicable)
 5. Submit PR with clear description
 
 ## Questions?
 
-Open an issue on GitHub!
+Open an issue on GitHub.

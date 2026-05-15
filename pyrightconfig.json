@@ -1,7 +1,6 @@
 {
   "exclude": [
-    "**/{{cookiecutter.repo_name}}/**",
-    "templates/**/{{cookiecutter.repo_name}}/**",
+    "**/{{repo_name}}/**",
     "templates/**/*.py"
   ],
   "reportMissingImports": true,

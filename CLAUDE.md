@@ -16,7 +16,7 @@ pytest tests/ -m "not slow"
 
 Run a single test:
 ```bash
-pytest tests/test_create_project.py::test_barebone_template_success
+pytest tests/test_base_generation.py::test_barebone_full_structure
 ```
 
 Run slow integration tests (generate projects, install deps, run their internal tests):
@@ -31,30 +31,64 @@ ruff check .
 
 ## Architecture
 
-This is a mono-repo of [Cookiecutter](https://cookiecutter.readthedocs.io/) templates for ML projects. The repo itself has no package — it's a template library with a test suite that validates generated output.
+This is a mono-repo of [Copier](https://copier.readthedocs.io/) templates for ML projects. The repo itself has no package — it's a template library with a test suite that validates generated output.
 
 ### Templates
 
-Templates are organized into category subdirectories. Each template directory contains:
-- `cookiecutter.json` — prompts/defaults presented to the user during generation
-- `hooks/post_gen_project.py` — runs after generation to handle conditional file removal/renaming and optional GitHub repo creation
-- `{{cookiecutter.repo_name}}/` — the generated project skeleton (Jinja2-templated)
+Templates are **flat** Copier templates: all files render directly into the destination directory (no outer `{{project_name}}/` subdirectory). Users create the project directory first, then run `copier copy` inside it.
 
 Available templates:
-- `templates/barebone/` — gold-standard minimal template; lives at root (not in a category); used as reference structure for tests
+- `templates/barebone/` — minimal starting point with core PyTorch Lightning + Hydra structure
 - `templates/core/classification/` — MNIST image classification (ClassificationModule + MNISTDataModule + Hydra configs)
-- `templates/generative/flow_matching/` — full flow matching implementation (PyTorch Lightning + Hydra); the most complete template
-- `templates/rl/` — reinforcement learning with SAC, TD3, PPO (discrete + continuous), RPO, and DQN; uses Gymnasium; has its own `hooks/post_gen_project.py`
+- `templates/generative/flow_matching/` — full flow matching implementation (PyTorch Lightning + Hydra)
+- `templates/rl/` — reinforcement learning with SAC, TD3, PPO (discrete + continuous), RPO, and DQN; uses Gymnasium
 
-See `TEMPLATE_ROADMAP.md` for the full planned directory layout including all future templates.
+Extensions live in `templates/extensions/` and are applied as a second `copier copy` pass on top of a base template:
+- `templates/extensions/image_logger/` — WandB image logging callback for classification projects
 
-### Key template options (cookiecutter.json)
+### Template structure
 
-- `deps_manager`: `pip` or `uv`. Controls whether `requirements.txt`/`requirements_dev.txt` or inline `pyproject.toml` dependencies are used. The post-gen hook renames `tasks_pip.py` or `tasks_uv.py` to `tasks.py` and removes the other.
-- `project_structure`: `full` (includes `docs/` with MkDocs) or `minimal` (docs removed, `build_docs`/`serve_docs` tasks stripped from `tasks.py`).
-- `create_github_repo`: Optionally calls `gh repo create` via GitHub CLI post-generation.
-- `project_name` must be a valid lowercase Python identifier (validated in the hook); `repo_name` is derived from it automatically.
-- Supported Python versions: 3.10–3.13 (enforced by hook validation).
+Each template directory contains:
+- `copier.yml` — questions, defaults, validators, `_exclude` rules, and `_tasks`
+- `.copier-answers.yml.jinja` — records answers for `copier update` lifecycle
+- Flat source files (`.jinja` suffix for files that need rendering, no suffix for verbatim)
+- `src/{{repo_name}}/` — the generated package (directory name is Jinja-rendered)
+
+The `_shared/` directory at the repo root contains:
+- `_shared/questions/author.yml`, `deps_manager.yml`, `licensing.yml` — shared question definitions included by all templates via `!include`
+- `_shared/scripts/add_deps.py` — deps-manager-aware dependency adder used by extension `_tasks`
+
+### Key template options
+
+- `deps_manager`: `pip`, `uv`, or `pixi`. Controls which dependency files are generated. Handled via `_exclude` in `copier.yml` (no post-gen hook needed).
+- `project_structure`: `full` (includes `docs/` with MkDocs) or `minimal` (docs excluded). Barebone only.
+- `create_github_repo`: Optionally calls `gh repo create` via `_tasks` after generation.
+- `project_name` must be a valid lowercase Python identifier (validated via `validator:` in `_shared/questions/author.yml`).
+- `repo_name` is derived from `project_name` as a hidden question (`when: false`) and is NOT stored in `.copier-answers.yml`.
+
+### Generating a project (Copier workflow)
+
+```bash
+# Create the project directory first, then copy into it
+mkdir my_project && cd my_project
+copier copy path/to/templates/barebone . --trust
+
+# Or non-interactively with data overrides
+copier copy templates/barebone /tmp/test_proj --defaults \
+  --data project_name=my_proj --data deps_manager=uv --trust
+```
+
+Applying an extension (from inside the generated project):
+```bash
+copier copy path/to/templates/extensions/image_logger . --trust
+```
+
+Updating a project when the template changes:
+```bash
+copier update --trust
+# Or for a specific extension:
+copier update --answers-file .copier-answers.image_logger.yml --trust
+```
 
 ### Generated project structure (gold standard — `barebone`/`flow_matching`)
 
@@ -77,54 +111,56 @@ tests/
     test_config.py
     test_data.py
     test_model.py
-tasks.py               # Invoke task runner (generated from tasks_pip.py or tasks_uv.py)
+tasks.py               # Invoke task runner (pip/uv) or absent (pixi uses pixi.toml tasks)
 pyproject.toml
+.copier-answers.yml    # Records generation answers; required for copier update
 ```
 
 ### Testing strategy
 
-`tests/test_create_project.py` validates template generation by:
-1. Calling `cookiecutter()` programmatically with `no_input=True` and `extra_context` overrides
-2. Asserting that expected files/directories exist in the output
-3. For `@pytest.mark.slow` tests: installing deps and running the generated project's own `pytest tests/` suite
+Tests validate template generation using the Copier Python API (`copier.run_copy()`):
 
-The barebone template's `test_project_structure` test serves as the authoritative spec for generated project layout — update it when changing the expected structure.
+- `tests/test_base_generation.py` — structure, deps variants (pip/uv/pixi), license, config naming, answers file; one section per template
+- `tests/test_validation.py` — validator rejection tests (invalid project names)
+- `tests/test_extension_application.py` — apply extensions on top of base, assert new files appear, base files untouched, deps injected
+- `tests/test_add_deps.py` — unit tests for `_shared/scripts/add_deps.py`
+
+The standard test helper pattern:
+```python
+copier.run_copy(
+    src_path=str(TEMPLATE_DIR),
+    dst_path=str(dst),
+    data={"project_name": "test_proj", ...},
+    defaults=True,
+    overwrite=True,
+    unsafe=True,  # required when template has _tasks
+)
+```
 
 ## Design Philosophy
 
 ### Model vs LightningModule separation
 
-**Models** (`src/<repo>/models/`) hold only weights and are responsible for one thing: take data in, return a prediction out. They are task-agnostic. A `UNet` doesn't know whether it's being used for flow matching or segmentation — data goes in, a tensor comes out. Models must not contain loss computation, optimizer logic, or any training algorithm.
+**Models** (`src/<repo>/models/`) hold only weights: take data in, return a tensor out. No loss, no optimizer, no training logic.
 
-**LightningModules** (`src/<repo>/<algo>_module.py`) contain all algorithm logic: loss functions, training/validation steps, schedulers, sampling, solver calls. The module defines *how* the model is trained, not what it is. Examples: `FlowMatchingModule`, `PPOModule`, `SegmentationModule`, `AutoEncoderModule`.
+**LightningModules** (`src/<repo>/<algo>_module.py`) contain all algorithm logic: loss functions, training/validation steps, schedulers, sampling, solver calls.
 
 ```
-models/unet.py        ← weights + forward pass only
-flow_matching_module.py  ← loss, noise schedule, ODE solver, training step
+models/unet.py               ← weights + forward pass only
+flow_matching_module.py      ← loss, noise schedule, ODE solver, training step
 ```
-
-When implementing a new template, ask: "would this code change if I swapped the backbone architecture?" If yes → it belongs in the LightningModule, not the model.
 
 ### Modularity via dependency injection
 
-Never write internal builder helpers like `_build_mlp()` or `_create_encoder()`. If a module needs an MLP, it receives one as a constructor argument. All components are injected via Hydra `_target_` so any part of the architecture can be swapped in config without touching code:
+All components are injected via Hydra `_target_` — never use internal builder helpers. Any part of the architecture can be swapped in config without touching code:
 
 ```yaml
-_target_: {{cookiecutter.repo_name}}.flow_matching_module.FlowMatching
+_target_: {{repo_name}}.flow_matching_module.FlowMatching
 
 model:
-  _target_: {{cookiecutter.repo_name}}.models.unet.UNet
+  _target_: {{repo_name}}.models.unet.UNet
   in_channels: 1
   model_channels: 64
-
-alpha_beta_scheduler:
-  _target_: {{cookiecutter.repo_name}}.modules.schedulers.LinearScheduler
-
-sampler:
-  _target_: {{cookiecutter.repo_name}}.modules.samplers.GaussianSampler
-
-ode_solver:
-  _target_: {{cookiecutter.repo_name}}.modules.solvers.EulerSolver
 
 optimizer:
   _target_: torch.optim.Adam
@@ -132,161 +168,66 @@ optimizer:
   lr: 0.001
 ```
 
-Every dependency that might reasonably change (model architecture, optimizer, scheduler, sampler, solver) is a Hydra-injectable argument. This is the compositional pattern all templates follow.
+### Extension contract
+
+An extension may: add new files, declare deps via `add_deps.py`, read the base `.copier-answers.yml` via `_external_data`, ask its own questions.
+
+An extension must NOT: overwrite base files, modify files from other extensions, edit `pyproject.toml`/`tasks.py`/`pixi.toml` directly.
 
 ### Code style
 
 - Type hints everywhere; Google-style docstrings on public classes/methods
 - Always document tensor shapes in ML code (`# (B, C, H, W)`)
-- Callbacks for non-essential training functionality (logging, checkpointing, visualization)
-- No hardcoded hyperparameters — everything goes in `configs/`
-- PEP 8 enforced via Ruff; no Black (Ruff formatter handles formatting)
-
-### Testing
-
-- Write tests for all critical components: datasets, models, training steps
-- Unit-test models and data modules in isolation (no full training run)
-- Use `conftest.py` fixtures for shared objects (model instances, dummy batches, configs)
-- Slow integration tests (`@pytest.mark.slow`) install deps and run the generated project's full test suite
-
-### Things to avoid
-
-- Internal `_build_*` helpers that hide architecture choices — inject instead
-- Logic about loss or training algorithm inside `models/` — put it in the LightningModule
-- Hardcoded values that belong in `configs/`
-- Skipping tests for new datasets or model components
-- Unnecessary dependencies beyond the template's stated purpose
+- No hardcoded hyperparameters — everything in `configs/`
+- PEP 8 enforced via Ruff
 
 ## New Template Development Workflow
 
-Use `test_temp/` as a sandbox when building a new template. This keeps work-in-progress out of `templates/` until it's ready.
+Use `test_temp/` as a sandbox. Copier templates are flat — all files render into `dst_path` directly.
 
 ### 1. Choose a donor template
 
-Pick the most structurally similar existing template:
-
 | New template type | Best donor |
 |---|---|
-| Supervised learning (core/) | `templates/barebone` or `templates/generative/flow_matching` |
+| Supervised learning | `templates/barebone` |
 | Classification/regression | `templates/core/classification` |
 | Generative model | `templates/generative/flow_matching` |
 | RL agent | `templates/rl` |
 
-### 2. Copy donor to test_temp/
+### 2. Copy donor to test_temp/ and iterate
 
 ```bash
 cp -r templates/<category>/<donor> test_temp/<new_template>
-# e.g. cp -r templates/core/classification test_temp/segmentation
 ```
 
-The template dir contains only: `cookiecutter.json`, `hooks/`, `{{cookiecutter.repo_name}}/` — no generated output.
+Key files to edit:
+- **`copier.yml`** — questions, `_exclude` rules, `_tasks`
+- **`src/{{repo_name}}/`** — source files (`.jinja` suffix for files needing rendering)
+- **`configs/`** — Hydra config files
 
-### 3. Iterate in sandbox
+Test generation:
+```bash
+copier copy test_temp/<new_template> test_temp/generated --defaults \
+  --data project_name=my_test --data deps_manager=pip --trust
+```
 
-Edit these three things in `test_temp/<new_template>/`:
+### 3. Add tests to `tests/test_base_generation.py`
 
-- **`cookiecutter.json`** — add/remove/rename parameters
-- **`hooks/post_gen_project.py`** — update validation logic and conditional file management
-- **`{{cookiecutter.repo_name}}/`** — modify the generated project skeleton (Jinja2-templated files)
+Follow the `_generate_*` helper pattern established in that file. Add:
+- Full structure test
+- Deps variants (pip/uv/pixi)
+- Config naming test (assert `_target_` uses `project_name`)
 
-Test generation after each major change (outputs land in `test_temp/generated/`, separate from the template):
+### 4. Run the test suite
 
 ```bash
-cookiecutter test_temp/<new_template> --output-dir test_temp/generated/ --no-input
+pytest tests/test_base_generation.py -k "<new_template>" -m "not slow"
+pytest tests/ -m "not slow"  # full fast suite
 ```
-
-Or use the Python API (more control over parameters):
-
-```python
-from cookiecutter.main import cookiecutter
-cookiecutter(
-    "test_temp/<new_template>",
-    no_input=True,
-    output_dir="test_temp/generated/",
-    extra_context={"project_name": "my_test", "deps_manager": "pip"},
-)
-```
-
-Inspect the generated output in `test_temp/generated/<project_name>/`. Delete and regenerate freely.
-
-### 4. Validate before transfer
-
-Run the generated project's own test suite:
-
-```bash
-cd test_temp/generated/<project_name>
-pip install -e ".[dev]"
-pytest tests/
-```
-
-Fix anything that fails back in `test_temp/<new_template>/`, regenerate, retest.
 
 ### 5. Transfer to templates/
 
-When the template is working, copy it across. A template directory is identifiable by the presence of `cookiecutter.json` at its root — generated projects never have this file.
-
 ```bash
-# Safety check: confirm this is a template, not a generated project
-ls test_temp/<new_template>/cookiecutter.json
-
-# Transfer to the appropriate category directory
 cp -r test_temp/<new_template> templates/<category>/<new_template>
-# e.g. cp -r test_temp/segmentation templates/core/segmentation
+rm -rf test_temp/<new_template> test_temp/generated/
 ```
-
-The template dir is clean (no `.venv`, `.pixi`, `__pycache__` — those only appear in generated output dirs). A plain `cp -r` is safe.
-
-### 6. Add tests to the test suite
-
-Add to `tests/test_create_project.py` (follow the existing pattern):
-
-```python
-def test_<new_template>_structure(temp_dir: Path) -> None:
-    """Assert expected files exist after generation."""
-    template_dir = (Path(__file__).parent / ".." / "templates" / "<category>" / "<new_template>").resolve()
-    cookiecutter(
-        template=str(template_dir),
-        output_dir=str(temp_dir),
-        no_input=True,
-        extra_context={"project_name": "test_proj", "python_version": "3.12"},
-    )
-    generated = temp_dir / "test_proj"
-    assert (generated / "src" / "test_proj").exists()
-    assert (generated / "tests").exists()
-    assert (generated / "configs").exists()
-    # Add all expected files/dirs
-
-@pytest.mark.parametrize("deps_manager", ["pip", "uv", "pixi"])
-def test_<new_template>_deps_variants(temp_dir: Path, deps_manager: str) -> None:
-    """Test each dependency manager variant."""
-    ...
-
-@pytest.mark.slow
-def test_<new_template>_internal_tests(temp_dir: Path) -> None:
-    """Generate project, install deps, run its test suite."""
-    ...
-```
-
-### 7. Run the test suite
-
-```bash
-# Fast check on the new template only
-pytest tests/test_create_project.py -k "<new_template>" -m "not slow"
-
-# Full fast suite (no regressions)
-pytest tests/ -m "not slow"
-
-# Slow integration test for the new template
-pytest tests/test_create_project.py::test_<new_template>_internal_tests
-```
-
-### Cleanup
-
-After the template is in `templates/` and tests pass, remove sandbox artifacts:
-
-```bash
-rm -rf test_temp/<new_template>
-rm -rf test_temp/generated/
-```
-
-Keep `test_temp/` itself (it is git-ignored for generated output).

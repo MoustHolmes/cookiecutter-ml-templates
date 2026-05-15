@@ -1,6 +1,6 @@
 # Template Roadmap
 
-Planned cookiecutter templates to implement. Ordered by priority within each tier.
+Planned Copier templates to implement. Ordered by priority within each tier.
 
 Existing templates: `barebone`, `classification`, `flow_matching`, `rl`, `MNIST_wandb_image_logger`
 
@@ -58,15 +58,16 @@ templates/
 
 **RL split note:** The monolithic `rl/` template currently lives at `templates/rl/`. When it is split into per-algorithm templates, the subdirectories will be created inside `templates/rl/` — no further top-level restructuring needed.
 
-### Copier Migration (explore on branch)
-Cookiecutter has no native template inheritance or update mechanism. [Copier](https://copier.readthedocs.io/) supports both via `_inherit_from` and `copier update`.
+### Copier Migration — COMPLETE
+All four base templates have been migrated to Copier. Extensions are applied as a second `copier copy` pass and can be independently updated with `copier update --answers-file .copier-answers.<name>.yml`.
 
-**Why it matters:** Extensions (image logger, gradio, HuggingFace page) cannot be cleanly composed onto an existing cookiecutter-generated project. Copier solves this natively.
+### Extensions
+Add-ons that layer on top of a generated project via `copier copy path/to/extension . --trust`.
 
-**Work:** Create a branch, migrate `barebone` to Copier, validate the pattern, then decide whether to migrate everything.
+Existing extensions:
+- `templates/extensions/image_logger` — WandB image logging callback (classification)
 
-### Extensions (post-Copier migration)
-Add-ons that layer on top of a generated project. Each extension is a Copier template that `_inherit_from` the relevant base template.
+Planned extensions:
 
 Planned extensions (in rough priority order):
 
