@@ -1,6 +1,6 @@
-"""Tests for cookiecutter template generation (classification, flow_matching, rl).
+"""Tests for cookiecutter template generation (flow_matching, rl).
 
-Barebone template tests have moved to test_base_generation.py (Copier API).
+Barebone and classification template tests have moved to test_base_generation.py (Copier API).
 """
 
 from pathlib import Path
@@ -12,96 +12,6 @@ from cookiecutter.main import cookiecutter
 @pytest.fixture
 def temp_dir(tmp_path: Path) -> Path:
     return tmp_path
-
-
-def test_classification_template_success(temp_dir: Path) -> None:
-    """Test successful generation of classification template.
-
-    Args:
-        temp_dir: temporary directory for test
-    """
-    output_dir = temp_dir / "classification_test"
-    current_dir = Path(__file__).parent
-    template_dir = (current_dir / ".." / "templates" / "core" / "classification").resolve()
-
-    # Generate project
-    cookiecutter(
-        template=str(template_dir),
-        output_dir=str(output_dir),
-        no_input=True,
-        extra_context={
-            "project_name": "test_classification",
-            "author_name": "Test Author",
-            "description": "Test Description",
-            "python_version": "3.10",
-        },
-    )
-
-    generated_dir = output_dir / "test_classification"
-    assert generated_dir.exists()
-    assert (generated_dir / "src" / "test_classification" / "classification_module.py").exists()
-    assert (generated_dir / "src" / "test_classification" / "data" / "mnist_datamodule.py").exists()
-    assert (generated_dir / "src" / "test_classification" / "callbacks" / "__init__.py").exists()
-    assert (generated_dir / "configs" / "train_config.yaml").exists()
-    assert (generated_dir / "configs" / "callbacks" / "default_callbacks.yaml").exists()
-    assert (generated_dir / "tests" / "test_model.py").exists()
-    assert (generated_dir / "tests" / "test_data.py").exists()
-    assert (generated_dir / "pyproject.toml").exists()
-
-
-def test_classification_with_uv_deps_manager(temp_dir: Path) -> None:
-    """Test generation of classification template with UV dependency manager.
-
-    Args:
-        temp_dir: temporary directory for test
-    """
-    output_dir = temp_dir / "classification_uv_test"
-    current_dir = Path(__file__).parent
-    template_dir = (current_dir / ".." / "templates" / "core" / "classification").resolve()
-
-    # Generate project with UV dependency manager
-    cookiecutter(
-        template=str(template_dir),
-        output_dir=str(output_dir),
-        no_input=True,
-        extra_context={
-            "project_name": "test_classification_uv",
-            "author_name": "Test Author",
-            "description": "Test UV Dependency Manager",
-            "python_version": "3.12",
-            "deps_manager": "uv",
-        },
-    )
-
-    generated_dir = output_dir / "test_classification_uv"
-    assert generated_dir.exists()
-
-    # Check that requirements files do NOT exist
-    assert not (generated_dir / "requirements.txt").exists()
-    assert not (generated_dir / "requirements_dev.txt").exists()
-
-    # Check that pyproject.toml exists with dependencies
-    pyproject_file = generated_dir / "pyproject.toml"
-    assert pyproject_file.exists()
-
-    with pyproject_file.open("r") as f:
-        pyproject_content = f.read()
-
-    # Verify it's the UV version with inline dependencies
-    assert "dependencies = [" in pyproject_content
-    assert "[project.optional-dependencies]" in pyproject_content
-    assert "dev = [" in pyproject_content
-
-    # Check that tasks.py uses uv run commands
-    tasks_file = generated_dir / "tasks.py"
-    assert tasks_file.exists()
-
-    with tasks_file.open("r") as f:
-        tasks_content = f.read()
-
-    # Verify uv run commands are present
-    assert "uv run" in tasks_content
-    assert "uv pip install" in tasks_content
 
 
 def test_flow_matching_with_uv_deps_manager(temp_dir: Path) -> None:

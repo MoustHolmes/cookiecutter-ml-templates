@@ -1,0 +1,25 @@
+---
+!include ../../../_shared/questions/author.yml
+---
+!include ../../../_shared/questions/deps_manager.yml
+---
+!include ../../../_shared/questions/licensing.yml
+---
+
+_answers_file: .copier-answers.yml
+
+_jinja_extensions:
+    - jinja2_time.TimeExtension
+
+_exclude:
+    - "copier.yml"
+    - "{% if deps_manager != 'pip' %}requirements.txt{% endif %}"
+    - "{% if deps_manager != 'pixi' %}pixi.toml{% endif %}"
+    - "{% if deps_manager == 'pixi' %}tasks.py{% endif %}"
+    - "{% if open_source_license == 'No license file' %}LICENSE{% endif %}"
+
+_tasks:
+    - command: >-
+          gh repo create {{github_username}}/{{repo_name}}
+          --description "{{description}}" --public --source . --push
+      when: "{{create_github_repo}}"

@@ -1,4 +1,4 @@
-"""Copier-based generation tests for the barebone template."""
+"""Copier-based generation tests for the barebone and classification templates."""
 
 from pathlib import Path
 
@@ -7,6 +7,7 @@ import pytest
 
 REPO_ROOT = (Path(__file__).parent / "..").resolve()
 BAREBONE_TEMPLATE = REPO_ROOT / "templates" / "barebone"
+CLASSIFICATION_TEMPLATE = REPO_ROOT / "templates" / "core" / "classification"
 
 
 @pytest.fixture
@@ -142,3 +143,75 @@ def test_barebone_answers_file_written(temp_dir: Path) -> None:
     answers = (out / ".copier-answers.yml").read_text()
     assert "project_name: test_project" in answers
     assert "_src_path:" in answers
+
+
+# --- Classification template ---
+
+
+def _generate_cls(dst: Path, **data) -> Path:
+    defaults = {
+        "project_name": "test_cls",
+        "author_name": "Test Author",
+        "description": "Test Description",
+        "python_version": "3.12",
+    }
+    defaults.update(data)
+    copier.run_copy(
+        src_path=str(CLASSIFICATION_TEMPLATE),
+        dst_path=str(dst),
+        data=defaults,
+        defaults=True,
+        overwrite=True,
+        unsafe=True,
+    )
+    return dst
+
+
+def test_classification_full_structure(temp_dir: Path) -> None:
+    out = _generate_cls(temp_dir / "full")
+
+    assert (out / "src" / "test_cls").exists()
+    assert (out / "src" / "test_cls" / "__init__.py").exists()
+    assert (out / "src" / "test_cls" / "train.py").exists()
+    assert (out / "src" / "test_cls" / "classification_module.py").exists()
+    assert (out / "src" / "test_cls" / "models" / "__init__.py").exists()
+    assert (out / "src" / "test_cls" / "data" / "mnist_datamodule.py").exists()
+    assert (out / "src" / "test_cls" / "callbacks" / "__init__.py").exists()
+
+    assert (out / "configs" / "train_config.yaml").exists()
+    assert (out / "configs" / "experiments" / "debug.yaml").exists()
+    assert (out / "configs" / "model" / "default_model.yaml").exists()
+    assert (out / "configs" / "data" / "default_data_module.yaml").exists()
+    assert (out / "docs" / "mkdocs.yaml").exists()
+
+    assert (out / "tests" / "test_model.py").exists()
+    assert (out / "tests" / "test_data.py").exists()
+    assert (out / ".copier-answers.yml").exists()
+
+
+def test_classification_pip_deps_manager(temp_dir: Path) -> None:
+    out = _generate_cls(temp_dir / "pip", deps_manager="pip")
+    assert (out / "requirements.txt").exists()
+    assert not (out / "pixi.toml").exists()
+
+
+def test_classification_uv_deps_manager(temp_dir: Path) -> None:
+    out = _generate_cls(temp_dir / "uv", deps_manager="uv")
+    assert not (out / "requirements.txt").exists()
+    assert not (out / "pixi.toml").exists()
+    assert "dependencies = [" in (out / "pyproject.toml").read_text()
+
+
+def test_classification_pixi_deps_manager(temp_dir: Path) -> None:
+    out = _generate_cls(temp_dir / "pixi", deps_manager="pixi")
+    assert (out / "pixi.toml").exists()
+    assert not (out / "tasks.py").exists()
+    assert not (out / "requirements.txt").exists()
+
+
+def test_classification_config_uses_repo_name(temp_dir: Path) -> None:
+    out = _generate_cls(temp_dir / "naming", project_name="my_cls")
+    model_cfg = (out / "configs" / "model" / "default_model.yaml").read_text()
+    assert "my_cls.classification_module.ClassificationModule" in model_cfg
+    data_cfg = (out / "configs" / "data" / "default_data_module.yaml").read_text()
+    assert "my_cls.data.mnist_datamodule.MNISTDataModule" in data_cfg
