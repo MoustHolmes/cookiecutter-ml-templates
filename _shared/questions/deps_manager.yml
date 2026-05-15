@@ -1,0 +1,5 @@
+deps_manager:
+    type: str
+    help: Dependency manager
+    default: pip
+    choices: [pip, uv, pixi]

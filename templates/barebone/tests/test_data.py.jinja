@@ -4,7 +4,7 @@ import pytest
 import torch
 from torch.utils.data import DataLoader
 
-from {{cookiecutter.repo_name}}.data.barebones_datamodule import BarebonesDataModule
+from {{repo_name}}.data.barebones_datamodule import BarebonesDataModule
 
 
 @pytest.fixture
@@ -62,8 +62,8 @@ def test_train_dataloader(datamodule):
 
     batch = next(iter(loader))
     assert len(batch) == 2  # (x, y) tuple
-    assert batch[0].shape[1:] == (1, 28, 28)  # Image dimensions with channel
-    assert batch[1].shape[0] == datamodule.hparams.batch_size  # Labels
+    assert batch[0].shape[1:] == (1, 28, 28)
+    assert batch[1].shape[0] == datamodule.hparams.batch_size
 
 
 def test_val_dataloader(datamodule):
@@ -78,7 +78,7 @@ def test_val_dataloader(datamodule):
 
     batch = next(iter(loader))
     assert len(batch) == 2
-    assert batch[0].shape[1:] == (1, 28, 28)  # Image dimensions with channel
+    assert batch[0].shape[1:] == (1, 28, 28)
     assert batch[1].shape[0] == datamodule.hparams.batch_size
 
 
@@ -94,5 +94,5 @@ def test_test_dataloader(datamodule):
 
     batch = next(iter(loader))
     assert len(batch) == 2
-    assert batch[0].shape[1:] == (1, 28, 28)  # Image dimensions with channel
+    assert batch[0].shape[1:] == (1, 28, 28)
     assert batch[1].shape[0] == datamodule.hparams.batch_size

@@ -22,6 +22,7 @@ memory:
 - `pixi-docs` — `pixi.toml`, channels, tasks, features
 - `uv-docs` — `pyproject.toml` (uv mode), `uv.lock`, `uvx`
 - `conda-docs` — `environment.yml`, channels, mamba
+- `copier-docs` — `copier.yml`, `copier copy`/`update`, `.copier-answers.yml`, `_tasks`, `_extends`, `_external_data`
 
 **Those skills handle version-correct API questions. This skill handles
 project conventions that override or supplement library defaults.**

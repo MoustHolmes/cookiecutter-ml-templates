@@ -1,6 +1,8 @@
-# {{cookiecutter.repo_name}}
+# {{repo_name}}
 
-{{cookiecutter.description}}
+{{description}}
+
+<!-- template update marker -->
 
 ## Overview
 
@@ -23,37 +25,37 @@ A minimal, well-structured machine learning project template with emphasis on:
 ├── reports/         # Generated reports and figures
 │   └── figures/
 ├── src/             # Source code
-│   └── {{cookiecutter.repo_name}}/
+│   └── {{repo_name}}/
 ├── tests/           # Unit tests
 └── tasks.py         # Automation tasks
 ```
 
 ## Features
 
-- 📊 **Experiment Management**:
+- **Experiment Management**:
   - Hydra for configuration management
   - Weights & Biases for experiment tracking
   - PyTorch Lightning for structured training loops
 
-- 🔍 **Code Quality**:
+- **Code Quality**:
   - Pre-commit hooks with Ruff and MyPy
   - Automated code formatting
   - Static type checking
   - Security checks with Bandit
 
-- 📝 **Documentation**:
+- **Documentation**:
   - Material for MkDocs
   - Google-style docstrings
   - Type hints
 
-- ✅ **Testing**:
+- **Testing**:
   - pytest for unit testing
   - Coverage reporting
   - Test-driven development ready
 
 ## Getting Started
 
-{% if cookiecutter.deps_manager == "pixi" %}
+{% if deps_manager == "pixi" %}
 1. Install dependencies:
 ```bash
 pixi install
@@ -63,7 +65,7 @@ pixi install
 ```bash
 pixi run pre-commit install
 ```
-{% elif cookiecutter.deps_manager == "uv" %}
+{% elif deps_manager == "uv" %}
 1. Create virtual environment and install dependencies:
 ```bash
 uv venv
@@ -78,8 +80,8 @@ pre-commit install
 {% else %}
 1. Create conda environment:
 ```bash
-conda create -n {{cookiecutter.repo_name}} python={{cookiecutter.python_version}}
-conda activate {{cookiecutter.repo_name}}
+conda create -n {{repo_name}} python={{python_version}}
+conda activate {{repo_name}}
 ```
 
 2. Install dependencies:
@@ -95,15 +97,17 @@ pre-commit install
 
 ## Development Workflow
 
-{% if cookiecutter.deps_manager == "pixi" %}
+{% if deps_manager == "pixi" %}
 Tasks are defined in `pixi.toml` and run with `pixi run`:
 
 - `pixi run train` - Run training
 - `pixi run test` - Run tests
 - `pixi run lint` - Lint code
 - `pixi run format` - Format code
+{% if project_structure == "full" %}
 - `pixi run build-docs` - Build documentation
 - `pixi run serve-docs` - Serve documentation locally
+{% endif %}
 {% else %}
 The project uses `invoke` for task automation. Here are the main commands:
 
@@ -111,8 +115,10 @@ The project uses `invoke` for task automation. Here are the main commands:
 - `invoke requirements` - Install project requirements
 - `invoke dev-requirements` - Install development requirements
 - `invoke test` - Run tests
+{% if project_structure == "full" %}
 - `invoke build-docs` - Build documentation
 - `invoke serve-docs` - Serve documentation locally
+{% endif %}
 {% endif %}
 
 ## Project Guidelines
@@ -127,4 +133,4 @@ The project uses `invoke` for task automation. Here are the main commands:
 
 ## Author
 
-{{cookiecutter.author_name}}
+{{author_name}}

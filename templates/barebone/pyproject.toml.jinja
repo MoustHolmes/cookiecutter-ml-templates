@@ -1,5 +1,5 @@
 [build-system]
-{%- if cookiecutter.deps_manager in ['uv', 'pixi'] %}
+{%- if deps_manager in ['uv', 'pixi'] %}
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 {%- else %}
@@ -8,22 +8,22 @@ build-backend = "setuptools.build_meta"
 {%- endif %}
 
 [project]
-name = {{ cookiecutter.repo_name|tojson }}
+name = "{{repo_name}}"
 version = "0.0.1"
-description = {{ cookiecutter.description|tojson }}
+description = "{{description}}"
 authors = [
-  { name = {{ cookiecutter.author_name|tojson }}, email = "your@email.com" },
+  { name = "{{author_name}}", email = "{{author_email}}" },
 ]
-{% if cookiecutter.open_source_license != 'No license file' %}license = { file = "LICENSE" }{% endif %}
+{% if open_source_license != 'No license file' %}license = { file = "LICENSE" }{% endif %}
 keywords = ["machine learning", "MLOps"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Programming Language :: Python :: 3",
 ]
 readme = "README.md"
-requires-python = ">={{ cookiecutter.python_version }}"
+requires-python = ">={{python_version}}"
 
-{%- if cookiecutter.deps_manager == 'uv' %}
+{%- if deps_manager == 'uv' %}
 dependencies = [
     "torch>=2.0.0",
     "lightning>=2.0.0",
@@ -45,7 +45,7 @@ dev = [
     "mkdocs-material>=9.4.0",
     "invoke>=2.2.0",
 ]
-{%- elif cookiecutter.deps_manager == 'pixi' %}
+{%- elif deps_manager == 'pixi' %}
 # Dependencies managed by pixi (see pixi.toml)
 {%- else %}
 dynamic = ["dependencies", "optional-dependencies"]

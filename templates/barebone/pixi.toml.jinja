@@ -1,12 +1,12 @@
 [workspace]
-name = "{{cookiecutter.repo_name}}"
+name = "{{repo_name}}"
 version = "0.0.1"
-description = "{{cookiecutter.description}}"
+description = "{{description}}"
 channels = ["conda-forge"]
 platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
 
 [dependencies]
-python = "{{cookiecutter.python_version}}.*"
+python = "{{python_version}}.*"
 pytorch = ">=2.0.0"
 torchvision = ">=0.15.0"
 lightning = ">=2.0.0"
@@ -16,7 +16,7 @@ numpy = ">=1.24.0"
 omegaconf = ">=2.3.0"
 
 [pypi-dependencies]
-{{cookiecutter.repo_name}} = { path = ".", editable = true }
+{{repo_name}} = { path = ".", editable = true }
 
 [feature.dev.dependencies]
 pytest = ">=7.4.0"
@@ -36,10 +36,12 @@ default = { features = ["dev"], solve-group = "default" }
 cuda = { features = ["cuda", "dev"], solve-group = "default" }
 
 [tasks]
-train = "python src/{{cookiecutter.repo_name}}/train.py"
+train = "python src/{{repo_name}}/train.py"
 test = "pytest tests/"
 lint = "ruff check ."
 format = "ruff format ."
-preprocess = "python src/{{cookiecutter.repo_name}}/data/make_dataset.py"
+preprocess = "python src/{{repo_name}}/data/make_dataset.py"
+{%- if project_structure == 'full' %}
 build-docs = "mkdocs build --strict"
 serve-docs = "mkdocs serve"
+{%- endif %}
