@@ -1,5 +1,0 @@
-_target_: {{cookiecutter.repo_name}}.data.barebones_datamodule.BarebonesDataModule
-
-data_dir: ${data_dir}
-batch_size: 32
-num_workers: 0

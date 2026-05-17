@@ -1,0 +1,10 @@
+open_source_license:
+    type: str
+    help: License
+    default: No license file
+    choices: [No license file, MIT, BSD-3-Clause, Apache-2.0]
+
+create_github_repo:
+    type: bool
+    help: Create a GitHub repository after generation?
+    default: false

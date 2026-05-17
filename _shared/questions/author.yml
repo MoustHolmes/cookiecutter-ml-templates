@@ -1,0 +1,44 @@
+project_name:
+    type: str
+    help: Python package name (lowercase, underscores only)
+    default: my_project
+    validator: >-
+        {% if not project_name.isidentifier() or project_name != project_name.lower() %}
+        project_name must be a valid Python identifier and fully lowercase (letters, digits, underscores; cannot start with a digit).
+        {% elif project_name in ['False','None','True','and','as','assert','async','await','break',
+          'class','continue','def','del','elif','else','except','finally','for','from',
+          'global','if','import','in','is','lambda','nonlocal','not','or','pass','raise',
+          'return','try','while','with','yield'] %}
+        project_name cannot be a Python keyword.
+        {% endif %}
+
+repo_name:
+    type: str
+    default: "{{ project_name | lower | replace(' ', '_') | replace('-', '_') }}"
+    when: false
+
+author_name:
+    type: str
+    help: Your name
+    default: Your Name
+
+author_email:
+    type: str
+    help: Your email
+    default: your@email.com
+
+github_username:
+    type: str
+    help: GitHub username
+    default: "{{ author_name | lower | replace(' ', '') }}"
+
+description:
+    type: str
+    help: Short project description
+    default: A machine learning project.
+
+python_version:
+    type: str
+    help: Python version
+    default: "3.12"
+    choices: ["3.10", "3.11", "3.12", "3.13"]

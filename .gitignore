@@ -86,7 +86,6 @@ multirun/
 poetry.lock
 pdm.lock
 
-# test template 
+# test template
 test_temp/
 inspiration_code/
-

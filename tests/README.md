@@ -1,66 +1,51 @@
 # Testing Strategy
 
-This project uses a multi-layered testing approach to ensure the cookiecutter templates work correctly.
+Tests validate template generation using the [Copier](https://copier.readthedocs.io/) Python API.
+
+## Test Files
+
+| File | What it tests |
+|------|--------------|
+| `test_base_generation.py` | Structure, deps variants, config naming, answers file — for all four base templates |
+| `test_validation.py` | `validator:` rejection tests (invalid project names) |
+| `test_extension_application.py` | Apply extensions on top of base, assert new files appear, base files untouched, deps injected |
+| `test_add_deps.py` | Unit tests for `_shared/scripts/add_deps.py` across all three deps managers |
+
+## Running Tests
+
+```bash
+# Fast tests (run on every commit)
+pytest tests/ -m "not slow" -v
+
+# Slow integration tests (run on main branch merges)
+pytest tests/ -m slow -v
+
+# Single template
+pytest tests/test_base_generation.py -k "barebone" -v
+```
 
 ## Test Layers
 
-### 1. Fast Tests (Structure & Generation)
-These tests run quickly and verify that:
-- Templates generate successfully
-- Required files and directories exist
-- File contents match expectations
-- Hook validation logic works correctly
+### Fast tests — structure and generation
 
-**Run with:**
-```bash
-pytest tests/ -v -m "not slow"
-```
-
-### 2. Slow Integration Tests  
-These tests take longer as they:
-1. Generate a complete project from a template
-2. Install all dependencies in a temporary environment
-3. Run the generated project's internal test suite
-
-These tests catch real bugs in the generated templates that structural tests might miss.
-
-**Run with:**
-```bash
-pytest tests/ -v -m "slow"
-```
-
-**Run all tests:**
-```bash
-pytest tests/ -v
-```
-
-## Current Status
-
-### Barebone Template
-- ✅ Structure tests pass
-- ⚠️ Integration tests reveal issues that need fixing:
-  - Missing `configs/data/default_data_module.yaml`
-  - Data module test assertions need updating
-  - Transform initialization issues
-
-### Flow Matching Template
-- ✅ Structure tests pass
-- 🔄 Integration tests not yet run (too complex for initial implementation)
-
-## Future Work
-
-1. Fix barebone template issues found by integration tests
-2. Add integration tests for other templates (MNIST_wandb, classification)
-3. Consider creating simplified "smoke test" versions that don't require full dependency installation
-4. Add CI/CD caching for faster integration test runs
-
-## Notes
-
-Integration tests are marked with `@pytest.mark.slow` to allow developers to skip them during rapid development:
+Use `copier.run_copy()` with `defaults=True` and `unsafe=True`. Assert expected files/directories exist and file contents match. Run in seconds.
 
 ```python
-@pytest.mark.slow
-def test_barebone_template_internal_tests(temp_dir: Path) -> None:
-    """Full integration test that runs generated project's tests."""
-    ...
+copier.run_copy(
+    src_path=str(TEMPLATE_DIR),
+    dst_path=str(dst),
+    data={"project_name": "test_proj", "deps_manager": "uv"},
+    defaults=True,
+    overwrite=True,
+    unsafe=True,
+)
 ```
+
+### Slow integration tests — internal test suite
+
+Generate a project, install its dependencies, run its own `pytest tests/` suite. Catches bugs that structural tests miss. Marked `@pytest.mark.slow` and excluded from the default run.
+
+## CI
+
+- **Fast tests**: run on every push and pull request, across Python 3.11 and 3.12
+- **Slow tests**: run only on main branch merges (see `.github/workflows/ci.yml`)

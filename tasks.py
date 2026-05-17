@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-import subprocess
-from pathlib import Path
-
-import yaml
 from invoke import Context, task
 
 
@@ -14,61 +10,40 @@ def test(c: Context) -> None:
 
 
 @task
+def test_fast(c: Context) -> None:
+    """Run fast tests only (exclude slow integration tests)."""
+    c.run('pytest tests/ -m "not slow" -v')
+
+
+@task
 def setup(c: Context) -> None:
     """Set up the development environment."""
-    c.run("pip install -e '.[dev]'")
+    c.run("pip install -r requirements.txt")
     c.run("pre-commit install")
 
 
 @task
-def create_template(c: Context, template: str, output_dir: str | None = None) -> None:
-    """Create a new project from a template."""
-    cmd = f"cookiecutter templates/{template}"
-    if output_dir:
-        cmd += f" --output-dir {output_dir}"
+def create(c: Context, template: str, dest: str = ".", project_name: str = "") -> None:
+    """Generate a project from a template using Copier.
+
+    Example:
+        invoke create --template barebone
+        invoke create --template rl --dest /tmp/my_rl --project-name my_rl
+    """
+    template_path = f"templates/{template}"
+    cmd = f'copier copy "{template_path}" "{dest}" --trust'
+    if project_name:
+        cmd += f" --data project_name={project_name}"
     c.run(cmd)
 
 
 @task
-def setup_defaults(_c: Context) -> None:
-    """Write author defaults to ~/.cookiecutterrc from git config and GitHub CLI.
+def docs(c: Context) -> None:
+    """Serve the MkDocs documentation site locally."""
+    c.run("mkdocs serve")
 
-    After running this once, cookiecutter will pre-fill author_name, author_email,
-    and github_username in every template prompt — you can still edit them at runtime.
-    """
 
-    def _run(*cmd: str) -> str:
-        try:
-            return subprocess.check_output(list(cmd), text=True, stderr=subprocess.DEVNULL).strip()  # noqa: S603
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            return ""
-
-    author_name = _run("git", "config", "--global", "user.name")
-    author_email = _run("git", "config", "--global", "user.email")
-    github_username = _run("gh", "api", "user", "--jq", ".login") or _run(
-        "git", "config", "--global", "github.user",
-    )
-
-    if not any([author_name, author_email, github_username]):
-        print("Nothing to save — set git config first:")
-        print("  git config --global user.name 'Your Name'")
-        print("  git config --global user.email 'your@email.com'")
-        return
-
-    rc_path = Path.home() / ".cookiecutterrc"
-    existing: dict = yaml.safe_load(rc_path.read_text()) if rc_path.exists() else {}
-    existing = existing or {}
-    ctx = existing.setdefault("default_context", {})
-
-    if author_name:
-        ctx["author_name"] = author_name
-    if author_email:
-        ctx["author_email"] = author_email
-    if github_username:
-        ctx["github_username"] = github_username
-
-    rc_path.write_text(yaml.dump(existing, default_flow_style=False, allow_unicode=True))
-
-    print(f"Saved to {rc_path}")
-    for k, v in ctx.items():
-        print(f"  {k}: {v}")
+@task
+def lint(c: Context) -> None:
+    """Run ruff linter."""
+    c.run("ruff check .")

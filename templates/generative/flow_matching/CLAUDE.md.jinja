@@ -1,0 +1,57 @@
+# {{project_name}}
+
+Flow matching generative model (conditional flow matching / ODE-based) with PyTorch Lightning + Hydra. Ships with 2D moons and MNIST examples.
+
+## Commands
+
+{% if deps_manager == 'pixi' -%}
+```bash
+pixi run train       # launch training
+pixi run test        # run test suite
+pixi run lint        # ruff check
+```
+{%- elif deps_manager == 'uv' -%}
+```bash
+uv run invoke train  # launch training
+uv run invoke test   # run test suite
+uv run ruff check .  # lint
+```
+{%- else -%}
+```bash
+invoke train         # launch training
+invoke test          # run test suite
+ruff check .         # lint
+```
+{%- endif %}
+
+Override the experiment config to switch datasets:
+```bash
+python src/{{repo_name}}/train.py +experiment=moons   # 2D moons
+python src/{{repo_name}}/train.py +experiment=debug   # fast sanity check
+```
+
+## Architecture
+
+**Hard boundary — math lives in the module, not the model:**
+- `src/{{repo_name}}/models/` — network weights only (`UNet` for images, `MLP` for 2D). Take a noisy sample + time → predict vector field. No loss, no ODE.
+- `src/{{repo_name}}/flow_matching_module.py` — owns the entire training objective: CFM loss, noise schedule, ODE solve at inference, logging.
+
+**`modules/` are stateless math primitives** shared across architectures:
+- `schedulers.py` — noise schedules
+- `solvers.py` — ODE integrators (Euler, RK4)
+- `samplers.py` — sampling utilities
+These are not LightningModules. Don't add training logic here.
+
+**Optional VAE stage:** `vae_module.py` encodes inputs into a latent space before flow matching. It is a separate LightningModule and can be disabled by removing it from the config.
+
+**Model selection is config-only:** swap `model/_target_` between `UNet` (image) and `MLP` (2D) without touching code.
+
+## Key files
+
+| File | Purpose |
+|---|---|
+| `src/{{repo_name}}/flow_matching_module.py` | CFM loss + ODE solve — the core algorithm |
+| `src/{{repo_name}}/models/unet.py` | Image backbone (weights only) |
+| `src/{{repo_name}}/models/mlp.py` | 2D toy backbone (weights only) |
+| `src/{{repo_name}}/modules/` | Stateless math: solvers, schedulers, samplers |
+| `configs/experiment/` | Preset configs per dataset |

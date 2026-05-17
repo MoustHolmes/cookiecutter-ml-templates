@@ -9,13 +9,14 @@ exclude = ["templates/"]
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["D100", "D103", "D104", "INP001", "T201"]
+ignore = ["D100", "D103", "D104", "INP001", "T201", "COM812"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["S101", "S607", "PLC0415", "PLW1510"]  # Test-only patterns
+"tests/*" = ["S101", "S607", "PLC0415", "PLW1510", "D101", "D102", "ANN101", "ANN401", "S603", "FBT001", "FBT002"]
+"_shared/scripts/add_deps.py" = ["EXE001", "S603"]
 
 [tool.coverage.run]
 include = ["src/*"]

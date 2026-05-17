@@ -1,0 +1,53 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+{%- if deps_manager == 'pip' %}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "{{python_version}}"
+          cache: 'pip'
+      - run: pip install ruff
+      - run: ruff check .
+{%- elif deps_manager == 'uv' %}
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: "{{python_version}}"
+      - run: uvx ruff check .
+{%- elif deps_manager == 'pixi' %}
+      - uses: prefix-dev/setup-pixi@v0.8.1
+        with:
+          cache: true
+      - run: pixi run lint
+{%- endif %}
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+{%- if deps_manager == 'pip' %}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "{{python_version}}"
+          cache: 'pip'
+      - run: pip install -e ".[dev]"
+      - run: pytest tests/ --cov=src/{{repo_name}} --cov-report=term-missing
+{%- elif deps_manager == 'uv' %}
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: "{{python_version}}"
+      - run: uv pip install -e ".[dev]"
+      - run: uv run pytest tests/ --cov=src/{{repo_name}} --cov-report=term-missing
+{%- elif deps_manager == 'pixi' %}
+      - uses: prefix-dev/setup-pixi@v0.8.1
+        with:
+          cache: true
+      - run: pixi run pytest tests/ --cov=src/{{repo_name}} --cov-report=term-missing
+{%- endif %}

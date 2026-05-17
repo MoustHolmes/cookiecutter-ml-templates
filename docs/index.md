@@ -1,37 +1,25 @@
-# Cookiecutter ML Templates
+# ML Templates
 
-!!! success "Latest Update"
-    All templates now include integration tests and are verified to work end-to-end! ✨
-
-A curated collection of **production-ready** Cookiecutter templates designed to jumpstart Machine Learning projects with best practices baked in.
+A curated collection of production-ready [Copier](https://copier.readthedocs.io/) templates for ML projects, with best practices built in.
 
 ## Why This Project?
 
-Developing ML models often involves repetitive setup and boilerplate code. Existing projects can be:
+Developing ML models involves repetitive setup. These templates give you a tested, opinionated starting point so you can focus on the model.
 
-- 📦 Outdated or poorly documented
-- 🎯 Too simplistic for real-world use
-- 🔧 Lacking modern MLOps practices
-
-**This library solves these problems** by providing:
-
-✅ **Reusable Foundations** - Clean, well-structured templates from real projects  
-✅ **Standardization** - Consistent structure across different ML tasks  
-✅ **Educational** - Clear examples with explanations of *why*  
-✅ **Production-Ready** - Robust starting points with testing, CI/CD, and more  
-✅ **Easy to Share** - Package and distribute successful patterns  
+- Clean structure derived from real projects
+- Consistent layout across ML task types
+- PyTorch Lightning + Hydra + modern tooling
+- pip, uv, and pixi all supported
 
 ## Quick Start
 
 ```bash
-# Install cookiecutter
-pip install cookiecutter
+# Install copier
+pip install copier
 
 # Create a new project from the barebone template
-cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/barebone
-
-# Or from the flow matching template
-cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/flow_matching
+mkdir my_project && cd my_project
+copier copy gh:MoustHolmes/cookiecutter-ml-templates/templates/barebone . --trust
 ```
 
 [Get Started →](getting-started/quickstart.md){ .md-button .md-button--primary }
@@ -43,37 +31,37 @@ cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/flow
 - :material-lightning-bolt: **PyTorch Lightning**
 
     ---
-    
+
     Built on PyTorch Lightning for structure, callbacks, and distributed training
 
 - :material-cog: **Hydra Configuration**
 
     ---
-    
-    Powerful config management with composition, overrides, and experiments
+
+    Config management with composition, overrides, and experiments
 
 - :material-test-tube: **Testing First**
 
     ---
-    
+
     Comprehensive unit and integration tests included in every template
 
-- :material-package-variant: **Dual Package Managers**
+- :material-package-variant: **Three Package Managers**
 
     ---
-    
-    Support for both pip and UV for dependency management
+
+    Support for pip, uv, and pixi
 
 - :material-code-braces: **Code Quality**
 
     ---
-    
-    Pre-configured with Ruff, Black, and pre-commit hooks
+
+    Pre-configured with Ruff and pre-commit hooks
 
 - :material-file-tree: **Flexible Structure**
 
     ---
-    
+
     Choose minimal or full project structure with docs
 
 </div>
@@ -85,8 +73,8 @@ cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/flow
 | [**Barebone**](available-templates/barebone.md) | Minimal starting point with core structure | ✅ Stable |
 | [**Flow Matching**](available-templates/flow-matching.md) | Complete flow matching implementation | ✅ Stable |
 | [**Reinforcement Learning**](available-templates/rl.md) | SAC, TD3, PPO, RPO, DQN with Gymnasium | ✅ Stable |
-| [**MNIST W&B Logger**](available-templates/mnist-wandb.md) | MNIST with Weights & Biases logging | ✅ Stable |
 | [**Classification**](available-templates/classification.md) | Image classification template | 🚧 Beta |
+| [**Image Logger** (extension)](available-templates/mnist-wandb.md) | W&B image logging, added to an existing project | ✅ Stable |
 
 ## Technology Stack
 
@@ -98,14 +86,13 @@ cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/flow
     - **[Hydra](https://hydra.cc/)** - Configuration management
 
 === "Dev Tools"
-    - **[Ruff](https://docs.astral.sh/ruff/)** - Fast Python linter
-    - **[Black](https://black.readthedocs.io/)** - Code formatter
+    - **[Ruff](https://docs.astral.sh/ruff/)** - Fast Python linter and formatter
     - **[Pytest](https://docs.pytest.org/)** - Testing framework
     - **[Invoke](https://www.pyinvoke.org/)** - Task runner
 
 === "MLOps"
     - **[Weights & Biases](https://wandb.ai/)** - Experiment tracking
-    - **[UV](https://docs.astral.sh/uv/)** - Fast package manager
+    - **[uv](https://docs.astral.sh/uv/)** / **[pixi](https://pixi.sh/)** - Fast package managers
     - **[MkDocs](https://www.mkdocs.org/)** - Documentation
 
 </div>
@@ -121,31 +108,30 @@ cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/flow
 
 ### Recent Updates
 
-- 🤖 Added **Reinforcement Learning** template with SAC, TD3, PPO, RPO, and DQN
-- ✨ Added integration tests that validate generated projects
-- 🎯 Standardized structure across all templates
-- 📦 Optional project scaffolding (minimal vs full)
-- ⚡ UV package manager support
-- 🧪 Comprehensive test suite with pytest markers
+- Migrated from Cookiecutter to **Copier** — flat template structure, `copier update` support
+- Added **pixi** as a fully supported dependency manager alongside pip and uv
+- MNIST W&B Logger converted to a composable **extension** (`templates/extensions/image_logger`)
+- Added **Reinforcement Learning** template with SAC, TD3, PPO, RPO, and DQN
+- Integration tests that validate generated projects end-to-end
 
 ## Next Steps
 
 <div class="grid cards" markdown>
 
 - [:material-rocket-launch: **Quick Start**](getting-started/quickstart.md)
-  
+
     Get your first project running in minutes
 
 - [:material-book-open-page-variant: **Browse Templates**](available-templates/overview.md)
-  
+
     Explore all available templates and choose the right one
 
 - [:material-school: **Read Guides**](guides/hydra-config.md)
-  
+
     Learn about configuration, testing, and best practices
 
 - [:material-github: **Contribute**](development/contributing.md)
-  
+
     Help make these templates even better
 
 </div>

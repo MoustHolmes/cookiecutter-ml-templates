@@ -1,0 +1,37 @@
+_answers_file: .copier-answers.image_logger.yml
+
+_external_data:
+    base: .copier-answers.yml
+
+# Populated silently from base answers
+project_name:
+    type: str
+    default: "{{ _external_data.base.project_name }}"
+    when: false
+
+repo_name:
+    type: str
+    default: "{{ project_name | lower | replace(' ', '_') | replace('-', '_') }}"
+    when: false
+
+deps_manager:
+    type: str
+    default: "{{ _external_data.base.deps_manager }}"
+    when: false
+
+# Extension-specific questions
+log_every_n_batches:
+    type: int
+    help: Log images every N training batches
+    default: 100
+
+num_samples:
+    type: int
+    help: Number of sample images to log per step
+    default: 8
+
+_tasks:
+    - command: >-
+          python "{{ _copier_conf.src_path }}/../../../_shared/scripts/add_deps.py"
+          "wandb>=0.16.0"
+          --answers-file .copier-answers.yml

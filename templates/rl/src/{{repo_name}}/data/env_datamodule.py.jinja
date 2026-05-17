@@ -1,0 +1,240 @@
+"""Gymnasium environment wrapper as a LightningDataModule.
+
+:class:`RLDataModule` encapsulates:
+
+- A Gymnasium environment (``env_id``).
+- A :class:`~{{repo_name}}.data.replay_buffer.ReplayBuffer`.
+- Optional online observation normalisation via
+  :class:`~{{repo_name}}.modules.normalizers.RunningMeanStd`.
+- A :class:`ReplayBufferDataset` (``IterableDataset``) that drives the
+  Lightning training loop by yielding pre-sampled
+  :class:`~{{repo_name}}.data.replay_buffer.Batch` objects.
+
+The agent's ``training_step`` calls back into this module via
+``self.trainer.datamodule.collect_experience()`` to fill the buffer before
+each gradient update.
+"""
+
+from __future__ import annotations
+
+from typing import Callable
+
+import gymnasium as gym
+import numpy as np
+import torch
+import lightning as L
+from torch.utils.data import DataLoader, IterableDataset
+
+from {{repo_name}}.data.replay_buffer import Batch, ReplayBuffer
+from {{repo_name}}.modules.normalizers import RunningMeanStd
+
+
+class ReplayBufferDataset(IterableDataset):
+    """An ``IterableDataset`` that yields batches sampled from a replay buffer.
+
+    Each iteration yields exactly ``num_batches`` :class:`Batch` objects so
+    that Lightning's training loop runs for a fixed number of gradient steps
+    per epoch.
+
+    Args:
+        buffer: The replay buffer to sample from.
+        batch_size: Number of transitions per batch.
+        num_batches: How many batches to yield per epoch.
+    """
+
+    def __init__(self, buffer: ReplayBuffer, batch_size: int, num_batches: int) -> None:
+        super().__init__()
+        self._buffer = buffer
+        self._batch_size = batch_size
+        self._num_batches = num_batches
+
+    def __iter__(self):  # noqa: D105
+        for _ in range(self._num_batches):
+            yield self._buffer.sample(self._batch_size)
+
+
+class RLDataModule(L.LightningDataModule):
+    """LightningDataModule wrapping a Gymnasium environment + ReplayBuffer.
+
+    Responsibilities:
+    - Create and manage the Gymnasium environment.
+    - Maintain a :class:`~{{repo_name}}.data.replay_buffer.ReplayBuffer`.
+    - Optionally normalise observations online using
+      :class:`~{{repo_name}}.modules.normalizers.RunningMeanStd`.
+    - Expose ``collect_experience()`` for the agent to call during
+      ``training_step``.
+    - Provide a ``train_dataloader()`` that returns an
+      :class:`IterableDataset`-backed ``DataLoader``.
+
+    Args:
+        env_id: Gymnasium environment identifier (e.g. ``"Pendulum-v1"``).
+        buffer_size: Maximum number of transitions in the replay buffer.
+        batch_size: Mini-batch size for gradient updates (also used by the
+            ``ReplayBufferDataset``).
+        num_workers: Number of DataLoader workers (keep 0 for IterableDataset).
+        seed: Random seed for the environment and numpy.
+        normalize_obs: Whether to apply online ``RunningMeanStd`` normalisation
+            to observations before passing them to the policy.
+        reward_scale: Multiplicative scalar applied to rewards before storage.
+        num_batches_per_epoch: How many batches to yield per Lightning epoch.
+    """
+
+    def __init__(
+        self,
+        env_id: str = "Pendulum-v1",
+        buffer_size: int = 100_000,
+        batch_size: int = 256,
+        num_workers: int = 0,
+        seed: int = 42,
+        normalize_obs: bool = True,
+        reward_scale: float = 1.0,
+        num_batches_per_epoch: int = 10,
+    ) -> None:
+        super().__init__()
+        self.save_hyperparameters()
+
+        self.env: gym.Env | None = None
+        self.replay_buffer: ReplayBuffer | None = None
+        self.obs_normalizer: RunningMeanStd | None = None
+
+        # Episode tracking — read by the agent and the EpisodeLoggerCallback
+        self.episode_rewards: list[float] = []
+        self.episode_lengths: list[int] = []
+
+        # Internal step state
+        self._obs: np.ndarray | None = None
+        self._episode_reward: float = 0.0
+        self._episode_length: int = 0
+
+        # Filled during setup — exposed for agent convenience
+        self.obs_dim: int = 0
+        self.action_dim: int = 0
+
+    # ------------------------------------------------------------------
+    # LightningDataModule lifecycle
+    # ------------------------------------------------------------------
+
+    def setup(self, stage: str | None = None) -> None:
+        """Create environment, infer dims, initialise buffer and normaliser."""
+        self.env = gym.make(self.hparams.env_id)
+
+        obs_space = self.env.observation_space
+        act_space = self.env.action_space
+        self.obs_dim = int(np.prod(obs_space.shape))
+        # Discrete envs store a scalar action index; Box envs store action_dim floats
+        self.action_dim = 1 if isinstance(act_space, gym.spaces.Discrete) else int(np.prod(act_space.shape))
+
+        self.replay_buffer = ReplayBuffer(
+            obs_dim=self.obs_dim,
+            action_dim=self.action_dim,
+            buffer_size=self.hparams.buffer_size,
+        )
+
+        if self.hparams.normalize_obs:
+            self.obs_normalizer = RunningMeanStd(shape=(self.obs_dim,))
+
+        obs, _ = self.env.reset(seed=self.hparams.seed)
+        self._obs = obs.astype(np.float32)
+
+    def train_dataloader(self) -> DataLoader:
+        """Return a DataLoader backed by the replay buffer.
+
+        ``batch_size=None`` prevents Lightning from trying to collate the
+        already-batched :class:`Batch` objects yielded by the dataset.
+        """
+        assert self.replay_buffer is not None, "Call setup() before train_dataloader()."
+        dataset = ReplayBufferDataset(
+            buffer=self.replay_buffer,
+            batch_size=self.hparams.batch_size,
+            num_batches=self.hparams.num_batches_per_epoch,
+        )
+        return DataLoader(
+            dataset,
+            batch_size=None,
+            num_workers=self.hparams.num_workers,
+        )
+
+    def val_dataloader(self) -> DataLoader:
+        """Minimal val dataloader — Lightning requires it; RL evaluation
+        happens via :class:`~{{repo_name}}.callbacks.episode_logger.EpisodeLoggerCallback`."""
+        return self.train_dataloader()
+
+    # ------------------------------------------------------------------
+    # Experience collection
+    # ------------------------------------------------------------------
+
+    def collect_experience(
+        self,
+        n_steps: int,
+        policy_fn: Callable[[torch.Tensor], torch.Tensor] | None = None,
+    ) -> None:
+        """Interact with the environment for ``n_steps`` and store transitions.
+
+        Args:
+            n_steps: Number of environment steps to collect.
+            policy_fn: ``Callable(obs_tensor: (1, obs_dim)) -> action_tensor: (1, action_dim)``.
+                       If ``None``, random actions are sampled (warm-up phase).
+        """
+        assert self.env is not None and self.replay_buffer is not None
+
+        is_discrete = isinstance(self.env.action_space, gym.spaces.Discrete)
+
+        for _ in range(n_steps):
+            obs_for_policy = self._maybe_normalize(self._obs)
+
+            if policy_fn is None:
+                raw_action = self.env.action_space.sample()
+            else:
+                obs_t = torch.tensor(obs_for_policy).unsqueeze(0)
+                with torch.no_grad():
+                    action_t = policy_fn(obs_t)
+                raw_action = action_t.squeeze(0).cpu().numpy()
+
+            # env.step needs the native dtype (int for Discrete, float for Box)
+            if is_discrete:
+                step_action = int(np.round(float(np.asarray(raw_action).flat[0])))
+            else:
+                step_action = np.asarray(raw_action, dtype=np.float32)
+
+            # buffer always stores float32
+            action = np.asarray(raw_action, dtype=np.float32).reshape(-1)
+
+            next_obs, reward, terminated, truncated, _ = self.env.step(step_action)
+            next_obs = next_obs.astype(np.float32)
+            scaled_reward = float(reward) * self.hparams.reward_scale
+
+            # Update normaliser with raw next_obs
+            if self.obs_normalizer is not None:
+                self.obs_normalizer.update(next_obs[np.newaxis])
+
+            self.replay_buffer.add(
+                obs=self._obs,
+                action=action,
+                reward=scaled_reward,
+                next_obs=next_obs,
+                terminated=bool(terminated),
+                truncated=bool(truncated),
+            )
+
+            self._episode_reward += float(reward)
+            self._episode_length += 1
+
+            if terminated or truncated:
+                self.episode_rewards.append(self._episode_reward)
+                self.episode_lengths.append(self._episode_length)
+                self._episode_reward = 0.0
+                self._episode_length = 0
+                obs, _ = self.env.reset()
+                self._obs = obs.astype(np.float32)
+            else:
+                self._obs = next_obs
+
+    # ------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------
+
+    def _maybe_normalize(self, obs: np.ndarray) -> np.ndarray:
+        """Normalise observation if ``normalize_obs`` is enabled."""
+        if self.obs_normalizer is not None:
+            return self.obs_normalizer.normalize(obs)
+        return obs

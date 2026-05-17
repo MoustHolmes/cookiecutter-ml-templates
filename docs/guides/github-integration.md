@@ -20,10 +20,10 @@ To use this feature, you need:
     ```bash
     # Debian/Ubuntu
     sudo apt install gh
-    
+
     # Fedora/RHEL
     sudo dnf install gh
-    
+
     # Arch
     sudo pacman -S github-cli
     ```
@@ -32,7 +32,7 @@ To use this feature, you need:
     ```powershell
     # Using winget
     winget install GitHub.cli
-    
+
     # Using scoop
     scoop install gh
     ```
@@ -52,34 +52,32 @@ Follow the prompts to authenticate via browser or token.
 When creating a new project, you'll be prompted:
 
 ```bash
-cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/barebone
+mkdir my_project && cd my_project
+copier copy gh:MoustHolmes/cookiecutter-ml-templates/templates/barebone . --trust
 ```
 
 **Prompts:**
 ```plaintext
-create_github_repo [no]: yes
+create_github_repo [false]: true
 github_username [yourname]: YourGitHubUsername
 ```
 
 !!! tip "What Happens"
     When you select "yes":
-    
+
     1. ✅ Git repository is initialized
     2. ✅ Initial commit is created
     3. ✅ GitHub repository is created
     4. ✅ Code is pushed to GitHub
-    
+
     All automatically!
 
 ## What Gets Created
 
-The hook will:
+The `_tasks:` block in `copier.yml` will run `gh repo create` to:
 
-- Initialize a local git repository
-- Create an initial commit with all template files
 - Create a public GitHub repository under your username
-- Push the initial commit to GitHub
-- Display the repository URL
+- Push the generated project to GitHub
 
 ## Example Output
 
@@ -111,12 +109,12 @@ By default, repositories are created as **public**. To create a private reposito
 
 ### Custom GitHub Username
 
-If your GitHub username differs from your author name, you can specify it:
+If your GitHub username differs from your author name, you will be prompted for it during `copier copy`. You can also override it non-interactively:
 
 ```bash
-cookiecutter gh:MoustHolmes/cookiecutter-ml-templates \
-    --directory=templates/barebone \
-    github_username=YourActualGitHubUsername
+mkdir my_project && cd my_project
+copier copy gh:MoustHolmes/cookiecutter-ml-templates/templates/barebone . --trust \
+    --data github_username=YourActualGitHubUsername
 ```
 
 ## Troubleshooting
@@ -178,17 +176,12 @@ gh repo create username/project-name --public --source=. --push
 
 ## Skipping GitHub Creation
 
-If you don't want to create a GitHub repository:
+If you don't want to create a GitHub repository, answer `false` when prompted for `create_github_repo`, or use `--defaults` and set it explicitly:
 
 ```bash
-# Interactive mode - just select "no"
-cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/barebone
-
-# Non-interactive mode
-cookiecutter gh:MoustHolmes/cookiecutter-ml-templates \
-    --directory=templates/barebone \
-    --no-input \
-    create_github_repo=no
+mkdir my_project && cd my_project
+copier copy gh:MoustHolmes/cookiecutter-ml-templates/templates/barebone . --trust \
+    --data create_github_repo=false --defaults
 ```
 
 ## Best Practices
@@ -201,7 +194,7 @@ cookiecutter gh:MoustHolmes/cookiecutter-ml-templates \
 
 !!! warning "Private Repositories"
     The default hook creates **public** repositories. For private repos:
-    
+
     ```bash
     # Create repo manually with private flag
     gh repo create username/project-name --private --source=. --push

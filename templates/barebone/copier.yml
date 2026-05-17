@@ -1,0 +1,39 @@
+---
+!include ../../_shared/questions/author.yml
+---
+!include ../../_shared/questions/deps_manager.yml
+---
+!include ../../_shared/questions/licensing.yml
+---
+
+project_structure:
+    type: str
+    help: Include docs/ with MkDocs setup?
+    default: full
+    choices: [full, minimal]
+
+_answers_file: .copier-answers.yml
+
+_jinja_extensions:
+    - jinja2_time.TimeExtension
+
+_exclude:
+    - "copier.yml"
+    - ".github/custom_instructions.md"
+    - "{% if deps_manager != 'pip' %}requirements.txt{% endif %}"
+    - "{% if deps_manager != 'pixi' %}pixi.toml{% endif %}"
+    - "{% if deps_manager == 'pixi' %}tasks.py{% endif %}"
+    - "{% if open_source_license == 'No license file' %}LICENSE{% endif %}"
+    - "{% if project_structure == 'minimal' %}docs{% endif %}"
+
+_tasks:
+    - command: >-
+          gh repo create {{github_username}}/{{repo_name}}
+          --description "{{description}}" --public --source . --push
+      when: "{{create_github_repo}}"
+    - command: "rm -rf .claude/skills/uv-docs .claude/skills/pixi-docs"
+      when: "{{deps_manager == 'pip'}}"
+    - command: "rm -rf .claude/skills/conda-docs .claude/skills/pixi-docs"
+      when: "{{deps_manager == 'uv'}}"
+    - command: "rm -rf .claude/skills/conda-docs .claude/skills/uv-docs"
+      when: "{{deps_manager == 'pixi'}}"

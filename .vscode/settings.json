@@ -7,17 +7,11 @@
         }
     ],
     "python.analysis.exclude": [
-        "**/{{cookiecutter.repo_name}}/**",
-        "templates/barebone/**",
-        "templates/classification/**",
-        "templates/flow_matching/**",
-        "templates/MNIST_wandb_image_logger/**"
+        "**/{{repo_name}}/**",
+        "templates/**"
     ],
     "python.analysis.ignore": [
-        "**/{{cookiecutter.repo_name}}/**",
-        "templates/barebone/**",
-        "templates/classification/**",
-        "templates/flow_matching/**",
-        "templates/MNIST_wandb_image_logger/**"
+        "**/{{repo_name}}/**",
+        "templates/**"
     ]
 }

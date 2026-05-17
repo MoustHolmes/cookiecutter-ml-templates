@@ -1,0 +1,83 @@
+# {{repo_name}}
+
+{{description}}
+
+## Project Overview
+
+This project follows the ML Ops template structure for maintainable and reproducible machine learning projects.
+
+## Project Structure
+
+```
+├── configs/          # Hydra configuration files
+├── data/             # Downloaded datasets
+├── docs/             # Documentation
+├── src/              # Source code
+│   └── {{repo_name}}/
+├── tests/            # Unit tests
+└── tasks.py          # Automation tasks
+```
+
+## Getting Started
+
+{% if deps_manager == "pixi" %}
+1. Install dependencies:
+```bash
+pixi install
+```
+
+2. Initialize pre-commit hooks:
+```bash
+pixi run pre-commit install
+```
+{% elif deps_manager == "uv" %}
+1. Create virtual environment and install dependencies:
+```bash
+uv venv
+source .venv/bin/activate
+uv pip install -e ".[dev]"
+```
+
+2. Initialize pre-commit hooks:
+```bash
+pre-commit install
+```
+{% else %}
+1. Create environment:
+```bash
+conda create -n {{repo_name}} python={{python_version}}
+conda activate {{repo_name}}
+```
+
+2. Install dependencies:
+```bash
+pip install -e ".[dev]"
+```
+
+3. Initialize pre-commit hooks:
+```bash
+pre-commit install
+```
+{% endif %}
+
+## Development Workflow
+
+{% if deps_manager == "pixi" %}
+Tasks are defined in `pixi.toml` and run with `pixi run`:
+
+- `pixi run train` - Run training
+- `pixi run test` - Run tests
+- `pixi run lint` - Lint code
+- `pixi run format` - Format code
+- `pixi run build-docs` - Build documentation
+- `pixi run serve-docs` - Serve documentation locally
+{% else %}
+The project uses `invoke` for task automation. Here are the main commands:
+
+- `invoke create-environment` - Create a new conda/venv environment
+- `invoke requirements` - Install project requirements
+- `invoke dev-requirements` - Install development requirements
+- `invoke test` - Run tests
+- `invoke build-docs` - Build documentation
+- `invoke serve-docs` - Serve documentation locally
+{% endif %}

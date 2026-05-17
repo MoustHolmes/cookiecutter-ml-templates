@@ -1,0 +1,20 @@
+# @package _global_
+
+# RolloutDataModule wrapping Pendulum-v1 — for PPO continuous / RPO
+# Pendulum-v1: obs_dim=3 (cos θ, sin θ, θ̇), action_dim=1 (torque ∈ [-2, 2])
+env:
+  _target_: {{repo_name}}.data.rollout_datamodule.RolloutDataModule
+  env_id: "Pendulum-v1"
+  num_envs: 1
+  seed: 42
+
+# Inject environment dimensions into agent sub-configs
+agent:
+  actor:
+    input_dim: 3
+    output_dim: 1
+  critic:
+    input_dim: 3
+  discrete: false
+  action_dim: 1
+  num_envs: 1             # must match env.num_envs

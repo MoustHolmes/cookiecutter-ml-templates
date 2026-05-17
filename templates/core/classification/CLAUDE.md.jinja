@@ -1,0 +1,49 @@
+# {{project_name}}
+
+MNIST image classification with PyTorch Lightning + Hydra. `ClassificationModule` wraps any backbone; `MNISTDataModule` handles data.
+
+## Commands
+
+{% if deps_manager == 'pixi' -%}
+```bash
+pixi run train       # launch training
+pixi run test        # run test suite
+pixi run lint        # ruff check
+```
+{%- elif deps_manager == 'uv' -%}
+```bash
+uv run invoke train  # launch training
+uv run invoke test   # run test suite
+uv run ruff check .  # lint
+```
+{%- else -%}
+```bash
+invoke train         # launch training
+invoke test          # run test suite
+ruff check .         # lint
+```
+{%- endif %}
+
+## Architecture
+
+**Model vs Module boundary:**
+- `src/{{repo_name}}/models/` — network weights only (forward pass → logits). No loss here.
+- `src/{{repo_name}}/classification_module.py` — cross-entropy loss, accuracy metric, optimizer. Add new metrics or losses here, not in models/.
+
+**MNISTDataModule** auto-downloads MNIST. It reads `paths.data_dir` from `configs/paths_config.yaml` — change that path if you move data.
+
+**Fast iteration:** `configs/experiments/debug.yaml` overrides batch size and max_epochs for quick sanity checks:
+```bash
+python src/{{repo_name}}/train.py +experiment=debug
+```
+
+**Swapping the backbone:** change `model._target_` in `configs/model/default_model.yaml` — no code changes needed.
+
+## Key files
+
+| File | Purpose |
+|---|---|
+| `src/{{repo_name}}/classification_module.py` | Loss, metrics, optimizer — extend here |
+| `src/{{repo_name}}/data/mnist_datamodule.py` | Data pipeline; reads `paths.data_dir` |
+| `configs/train_config.yaml` | Root Hydra config |
+| `configs/experiments/debug.yaml` | Override for fast iteration |

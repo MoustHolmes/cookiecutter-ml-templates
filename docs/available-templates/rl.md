@@ -15,16 +15,17 @@ Complete reinforcement learning implementation supporting multiple off-policy an
 ## Usage
 
 ```bash
-cookiecutter gh:MoustHolmes/cookiecutter-ml-templates --directory=templates/rl
+mkdir my_project && cd my_project
+copier copy gh:MoustHolmes/cookiecutter-ml-templates/templates/rl . --trust
 ```
 
 ## Configuration Options
 
 | Option | Values | Description |
 |--------|--------|-------------|
-| `deps_manager` | `pip`, `uv` | Dependency manager |
+| `deps_manager` | `pip`, `uv`, `pixi` | Dependency manager |
 | `open_source_license` | MIT, BSD-3-Clause, Apache-2.0, No license file | License |
-| `create_github_repo` | `no`, `yes` | Auto-create GitHub repo via `gh` CLI |
+| `create_github_repo` | true/false | Auto-create GitHub repo via `gh` CLI |
 
 ## Training
 
@@ -103,6 +104,12 @@ tests/
 | PPO | On-policy | Discrete | `agent=ppo_discrete` |
 | RPO | On-policy | Continuous | `agent=rpo` |
 | DQN | Off-policy | Discrete | `agent=dqn` |
+
+## Updating
+
+```bash
+copier update --trust
+```
 
 ## Use Cases
 

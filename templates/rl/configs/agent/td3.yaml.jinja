@@ -1,0 +1,46 @@
+_target_: {{repo_name}}.td3_module.TD3Module
+
+# Deterministic actor — obs_dim / action_dim injected by the env config
+actor:
+  _target_: {{repo_name}}.models.actor.DeterministicActor
+  obs_dim: ???
+  action_dim: ???
+  hidden_dim: 256
+  num_layers: 2
+
+# Critic
+critic:
+  _target_: {{repo_name}}.models.critic.TwinCritic
+  obs_dim: ???
+  action_dim: ???
+  hidden_dim: 256
+  num_layers: 2
+
+# Action space scaling — injected by the env config
+action_scale: ???       # (high - low) / 2
+action_bias: ???        # (high + low) / 2
+
+# TD3 hyperparameters
+gamma: 0.99
+tau: 0.005
+batch_size: 256
+learning_starts: 1000
+collect_steps_per_update: 1
+gradient_steps: 1
+
+# TD3-specific stabilisation
+policy_delay: 2
+exploration_noise: 0.1
+target_noise: 0.2
+target_noise_clip: 0.5
+
+# Optimizers
+actor_optimizer:
+  _target_: torch.optim.Adam
+  _partial_: true
+  lr: 3.0e-4
+
+critic_optimizer:
+  _target_: torch.optim.Adam
+  _partial_: true
+  lr: 3.0e-4
