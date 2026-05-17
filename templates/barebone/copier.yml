@@ -19,6 +19,7 @@ _jinja_extensions:
 
 _exclude:
     - "copier.yml"
+    - ".github/custom_instructions.md"
     - "{% if deps_manager != 'pip' %}requirements.txt{% endif %}"
     - "{% if deps_manager != 'pixi' %}pixi.toml{% endif %}"
     - "{% if deps_manager == 'pixi' %}tasks.py{% endif %}"
@@ -30,3 +31,9 @@ _tasks:
           gh repo create {{github_username}}/{{repo_name}}
           --description "{{description}}" --public --source . --push
       when: "{{create_github_repo}}"
+    - command: "rm -rf .claude/skills/uv-docs .claude/skills/pixi-docs"
+      when: "{{deps_manager == 'pip'}}"
+    - command: "rm -rf .claude/skills/conda-docs .claude/skills/pixi-docs"
+      when: "{{deps_manager == 'uv'}}"
+    - command: "rm -rf .claude/skills/conda-docs .claude/skills/uv-docs"
+      when: "{{deps_manager == 'pixi'}}"

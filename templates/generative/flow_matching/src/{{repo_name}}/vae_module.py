@@ -14,12 +14,12 @@ from torch.optim import Adam
 
 class SpatialEncoder(nn.Module):
     def __init__(
-            self, 
-            in_channels: int = 1, 
+            self,
+            in_channels: int = 1,
             latent_channels: int = 4
         ):
         super().__init__()
-        # MNIST is 28x28. 
+        # MNIST is 28x28.
         # Layer 1: 28x28 -> 14x14
         self.conv1 = nn.Sequential(
             nn.Conv2d(in_channels, 32, kernel_size=3, stride=2, padding=1),
@@ -47,16 +47,16 @@ class SpatialEncoder(nn.Module):
 class SpatialDecoder(nn.Module):
     def __init__(
             self,
-            out_channels: int = 1, 
+            out_channels: int = 1,
             latent_channels: int = 4
         ):
         super().__init__()
-        
+
         self.conv_in = nn.Sequential(
             nn.Conv2d(latent_channels, 64, kernel_size=3, padding=1),
             nn.SiLU()
         )
-        
+
         # Layer 1 Upsample: 7x7 -> 14x14
         self.up1 = nn.Sequential(
             nn.Upsample(scale_factor=2, mode='nearest'),
@@ -64,7 +64,7 @@ class SpatialDecoder(nn.Module):
             nn.BatchNorm2d(32),
             nn.SiLU()
         )
-        
+
         # Layer 2 Upsample: 14x14 -> 28x28
         self.up2 = nn.Sequential(
             nn.Upsample(scale_factor=2, mode='nearest'),
@@ -72,7 +72,7 @@ class SpatialDecoder(nn.Module):
             nn.BatchNorm2d(32),
             nn.SiLU()
         )
-        
+
         self.final = nn.Conv2d(32, out_channels, kernel_size=3, padding=1)
 
     def forward(self, z):
@@ -83,10 +83,10 @@ class SpatialDecoder(nn.Module):
 
 class SpatialVAE(L.LightningModule):
     def __init__(
-            self, 
-            in_channels: int = 1, 
-            latent_channels: int = 4, 
-            kl_weight: float = 0.00025, 
+            self,
+            in_channels: int = 1,
+            latent_channels: int = 4,
+            kl_weight: float = 0.00025,
             lr: float = 1e-3
         ):
         super().__init__()
@@ -96,7 +96,7 @@ class SpatialVAE(L.LightningModule):
         self.lr = lr
 
         self.kl_weight = kl_weight
-        
+
         # Important: Scale factor for Latent Flow Matching
         # This acts like the "scale" parameter in Wan2.2
         self.register_buffer('scale_factor', torch.tensor(1.0))
@@ -111,7 +111,7 @@ class SpatialVAE(L.LightningModule):
         std = torch.exp(0.5 * log_var)
         eps = torch.randn_like(std)
         return mu + eps * std
-    
+
     def model_step(self, batch):
         x, _ = batch
         recon, mu, log_var = self(x)
@@ -123,12 +123,12 @@ class SpatialVAE(L.LightningModule):
         loss = recon_loss + self.kl_weight * kld_loss
 
         return {"loss": loss, "recon_loss": recon_loss, "kld_loss": kld_loss}
-    
+
     def training_step(self, batch: tuple[torch.Tensor, torch.Tensor], batch_idx: int) -> torch.Tensor:
         losses = self.model_step(batch)
         self.log_dict({f"train/{k}": v for k, v in losses.items()}, on_step=True, on_epoch=True, prog_bar=True)
         return losses["loss"]
-    
+
     def validation_step(self, batch: tuple[torch.Tensor, torch.Tensor], batch_idx: int) -> None:
         losses = self.model_step(batch)
         self.log_dict({f"val/{k}": v for k, v in losses.items()}, on_step=False, on_epoch=True, prog_bar=True)
@@ -149,7 +149,7 @@ class SpatialVAE(L.LightningModule):
             x = x.to(self.device)
             mu, _ = self.encoder(x)
             all_mus.append(mu)
-        
+
         all_mus = torch.cat(all_mus, dim=0)
         std = all_mus.std()
         # In Wan/SD, they scale latents so they have approx unit variance

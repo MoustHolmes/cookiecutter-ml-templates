@@ -287,7 +287,7 @@ class FlowMatchingCFG(L.LightningModule):
         # We pass the guided callable to the solver. The solver will internally call it like:
         # guided_model_callable(x, t, labels=labels)
         return self.ode_solver.solve(guided_model_callable, x0=x0, labels=labels, steps=steps)
-    
+
 
 
 class LatentFlowMatching(FlowMatching):
@@ -317,7 +317,7 @@ class LatentFlowMatching(FlowMatching):
         freeze_ae: bool = True,
     ) -> None:
         """Initializes the LatentFlowMatching module.
-        
+
         Args:
             model: The flow matching model.
             encoder: Optional encoder instance.
@@ -334,18 +334,18 @@ class LatentFlowMatching(FlowMatching):
             lr_scheduler=lr_scheduler,
         )
         self.save_hyperparameters(logger=False, ignore=["latent_processor", "model", "alpha_beta_scheduler", "sampler", "ode_solver"])
-        
+
         # Restore hparams that might have been overwritten with None by self.save_hyperparameters
         self.hparams.optimizer = optimizer or partial(Adam, lr=1e-3)
         self.hparams.lr_scheduler = lr_scheduler or partial(ReduceLROnPlateau, patience=5, factor=0.2)
 
         self.latent_processor = latent_processor
-        
+
 
     def model_step(self, batch: tuple[torch.Tensor, torch.Tensor]) -> torch.Tensor:
         """Performs a single model step involves encoding data first."""
         real_images, labels = batch
-        
+
         latents = self.latent_processor.encode(real_images)
 
         return super().model_step((latents, labels))
@@ -399,13 +399,13 @@ class LatentFlowMatchingCFG(FlowMatchingCFG):
         self.hparams.optimizer = optimizer or partial(Adam, lr=1e-4)
         self.hparams.lr_scheduler = lr_scheduler or partial(ReduceLROnPlateau, patience=5, factor=0.2)
         self.hparams.num_classes = num_classes + 1
-        
+
         self.latent_processor = latent_processor
 
     def model_step(self, batch: tuple[torch.Tensor, torch.Tensor]) -> torch.Tensor:
         """Performs a single model step involves encoding data first."""
         real_images, labels = batch
-        
+
         latents = self.latent_processor.encode(real_images)
 
         return super().model_step((latents, labels))

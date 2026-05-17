@@ -32,3 +32,9 @@ _tasks:
           gh repo create {{github_username}}/{{repo_name}}
           --description "{{description}}" --public --source . --push
       when: "{{create_github_repo}}"
+    - command: "rm -rf .claude/skills/uv-docs .claude/skills/pixi-docs"
+      when: "{{deps_manager == 'pip'}}"
+    - command: "rm -rf .claude/skills/conda-docs .claude/skills/pixi-docs"
+      when: "{{deps_manager == 'uv'}}"
+    - command: "rm -rf .claude/skills/conda-docs .claude/skills/uv-docs"
+      when: "{{deps_manager == 'pixi'}}"

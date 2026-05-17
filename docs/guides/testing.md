@@ -47,11 +47,11 @@ pytest tests/ -m slow -v
 
 !!! info "Why Slow Tests?"
     Integration tests take 30-40 seconds per template because they:
-    
+
     - Create real projects
     - Install actual dependencies
     - Run full test suites
-    
+
     But they catch **real bugs** that structural tests miss!
 
 ### Running Specific Tests
@@ -116,9 +116,9 @@ def test_train_dataloader(datamodule):
     """Test if train_dataloader returns correct format."""
     datamodule.prepare_data()
     datamodule.setup(stage="fit")
-    
+
     loader = datamodule.train_dataloader()
-    
+
     assert isinstance(loader, DataLoader)
     batch = next(iter(loader))
     assert len(batch) == 2  # (x, y)
@@ -141,7 +141,7 @@ def test_model_forward(model):
     """Test model forward pass."""
     x = torch.randn(2, 1, 28, 28)
     output = model(x)
-    
+
     assert output.shape == (2, 10)  # batch_size, num_classes
 ```
 
@@ -275,15 +275,15 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.10'
-      
+
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
           pip install -e .
-      
+
       - name: Run fast tests
         run: pytest tests/ -m "not slow"
-      
+
       - name: Run integration tests
         run: pytest tests/ -m slow
 ```
@@ -302,7 +302,7 @@ open htmlcov/index.html
 
 !!! success "Target Coverage"
     Aim for **>80% coverage** for critical paths:
-    
+
     - Data loading: 90%+
     - Model forward/backward: 85%+
     - Training loop: 70%+
@@ -319,13 +319,13 @@ import pytest
 def test_custom_loss():
     """Test custom loss function."""
     from my_project.losses import CustomLoss
-    
+
     loss_fn = CustomLoss()
     pred = torch.randn(10, 5)  # batch_size=10, classes=5
     target = torch.randint(0, 5, (10,))
-    
+
     loss = loss_fn(pred, target)
-    
+
     # Assertions
     assert loss.item() > 0  # Loss should be positive
     assert loss.requires_grad  # Should be differentiable
@@ -340,16 +340,16 @@ def test_custom_loss():
 def test_transforms():
     """Test that transforms are applied correctly."""
     from torchvision import transforms
-    
+
     transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize((0.5,), (0.5,))
     ])
-    
+
     # Create dummy image
     img = Image.new('L', (28, 28), color=128)
     tensor = transform(img)
-    
+
     assert tensor.shape == (1, 28, 28)
     assert -1 <= tensor.min() <= tensor.max() <= 1
 ```
@@ -362,9 +362,9 @@ def test_model_on_gpu(model):
     """Test model works on GPU."""
     model = model.cuda()
     x = torch.randn(2, 1, 28, 28).cuda()
-    
+
     output = model(x)
-    
+
     assert output.is_cuda
 ```
 
@@ -374,14 +374,14 @@ def test_model_on_gpu(model):
 def test_checkpoint_save_load(model, tmp_path):
     """Test model can be saved and loaded."""
     checkpoint_path = tmp_path / "model.ckpt"
-    
+
     # Save
     torch.save(model.state_dict(), checkpoint_path)
-    
+
     # Load
     new_model = type(model)(**model_config)
     new_model.load_state_dict(torch.load(checkpoint_path))
-    
+
     # Compare
     for p1, p2 in zip(model.parameters(), new_model.parameters()):
         assert torch.allclose(p1, p2)

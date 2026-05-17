@@ -1,6 +1,7 @@
 """Copier-based generation tests for the barebone, classification, and flow_matching templates."""
 
 from pathlib import Path
+from typing import Any
 
 import copier
 import pytest
@@ -12,12 +13,12 @@ FLOW_MATCHING_TEMPLATE = REPO_ROOT / "templates" / "generative" / "flow_matching
 RL_TEMPLATE = REPO_ROOT / "templates" / "rl"
 
 
-@pytest.fixture
+@pytest.fixture()
 def temp_dir(tmp_path: Path) -> Path:
     return tmp_path
 
 
-def _generate(dst: Path, **data) -> Path:
+def _generate(dst: Path, **data: Any) -> Path:
     defaults = {
         "project_name": "test_project",
         "author_name": "Test Author",
@@ -70,6 +71,7 @@ def test_barebone_full_structure(temp_dir: Path) -> None:
     assert (out / "README.md").exists()
     assert (out / ".gitignore").exists()
     assert (out / ".pre-commit-config.yaml").exists()
+    assert (out / ".github" / "workflows" / "ci.yml").exists()
     assert (out / ".copier-answers.yml").exists()
 
 
@@ -150,7 +152,7 @@ def test_barebone_answers_file_written(temp_dir: Path) -> None:
 # --- Classification template ---
 
 
-def _generate_cls(dst: Path, **data) -> Path:
+def _generate_cls(dst: Path, **data: Any) -> Path:
     defaults = {
         "project_name": "test_cls",
         "author_name": "Test Author",
@@ -188,6 +190,7 @@ def test_classification_full_structure(temp_dir: Path) -> None:
 
     assert (out / "tests" / "test_model.py").exists()
     assert (out / "tests" / "test_data.py").exists()
+    assert (out / ".github" / "workflows" / "ci.yml").exists()
     assert (out / ".copier-answers.yml").exists()
 
 
@@ -222,7 +225,7 @@ def test_classification_config_uses_repo_name(temp_dir: Path) -> None:
 # --- Flow matching template ---
 
 
-def _generate_flow(dst: Path, **data) -> Path:
+def _generate_flow(dst: Path, **data: Any) -> Path:
     defaults = {
         "project_name": "test_flow",
         "author_name": "Test Author",
@@ -268,7 +271,8 @@ def test_flow_matching_full_structure(temp_dir: Path) -> None:
     assert (out / "tests" / "test_config.py").exists()
     assert (out / "tests" / "test_train_script.py").exists()
 
-    assert (out / "data" / "MNIST" / "raw").exists()
+    assert (out / "data" / "MNIST" / "raw" / ".gitkeep").exists()
+    assert (out / ".github" / "workflows" / "ci.yml").exists()
     assert (out / ".copier-answers.yml").exists()
 
 
@@ -313,9 +317,11 @@ def test_flow_matching_config_uses_repo_name(temp_dir: Path) -> None:
 
 def test_flow_matching_skip_mnist_data(temp_dir: Path) -> None:
     out = _generate_flow(temp_dir / "skip")
-    mnist_file = out / "data" / "MNIST" / "raw" / "train-images-idx3-ubyte"
-    assert mnist_file.exists()
-    original_mtime = mnist_file.stat().st_mtime
+
+    # Seed a fake data file to simulate downloaded MNIST data
+    fake_data = out / "data" / "MNIST" / "raw" / "train-images-idx3-ubyte"
+    fake_data.write_bytes(b"fake mnist content")
+    original_mtime = fake_data.stat().st_mtime
 
     # Re-run copy — _skip_if_exists should preserve existing MNIST data
     copier.run_copy(
@@ -326,13 +332,13 @@ def test_flow_matching_skip_mnist_data(temp_dir: Path) -> None:
         overwrite=True,
         unsafe=True,
     )
-    assert mnist_file.stat().st_mtime == original_mtime
+    assert fake_data.stat().st_mtime == original_mtime
 
 
 # --- RL template ---
 
 
-def _generate_rl(dst: Path, **data) -> Path:
+def _generate_rl(dst: Path, **data: Any) -> Path:
     defaults = {
         "project_name": "test_rl",
         "author_name": "Test Author",
@@ -377,6 +383,7 @@ def test_rl_full_structure(temp_dir: Path) -> None:
     for test_file in ("conftest.py", "test_config.py", "test_data.py", "test_model.py", "test_train_script.py"):
         assert (tests / test_file).exists()
 
+    assert (out / ".github" / "workflows" / "ci.yml").exists()
     assert (out / ".copier-answers.yml").exists()
 
 

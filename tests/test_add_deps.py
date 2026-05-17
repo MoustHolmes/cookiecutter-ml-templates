@@ -1,6 +1,6 @@
 """Unit tests for _shared/scripts/add_deps.py.
 
-Covers all 9 cases: 3 managers × {runtime dep, dev dep, already-present dep}.
+Covers all 9 cases: 3 managers x {runtime dep, dev dep, already-present dep}.
 """
 from __future__ import annotations
 
@@ -8,13 +8,12 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
 import yaml
 
 ADD_DEPS = (Path(__file__).parent / ".." / "_shared" / "scripts" / "add_deps.py").resolve()
 
 
-def _run(dep: str, answers_file: Path, dev: bool = False) -> subprocess.CompletedProcess:
+def _run(dep: str, answers_file: Path, *, dev: bool = False) -> subprocess.CompletedProcess:
     cmd = [sys.executable, str(ADD_DEPS), dep, "--answers-file", str(answers_file)]
     if dev:
         cmd.append("--dev")
@@ -28,6 +27,7 @@ def _write_answers(tmp_path: Path, deps_manager: str) -> Path:
 
 
 # ── pip ──────────────────────────────────────────────────────────────────────
+
 
 class TestPip:
     def _setup(self, tmp_path: Path) -> Path:

@@ -31,37 +31,37 @@ copier copy gh:MoustHolmes/cookiecutter-ml-templates/templates/barebone . --trus
 - :material-lightning-bolt: **PyTorch Lightning**
 
     ---
-    
+
     Built on PyTorch Lightning for structure, callbacks, and distributed training
 
 - :material-cog: **Hydra Configuration**
 
     ---
-    
+
     Config management with composition, overrides, and experiments
 
 - :material-test-tube: **Testing First**
 
     ---
-    
+
     Comprehensive unit and integration tests included in every template
 
 - :material-package-variant: **Three Package Managers**
 
     ---
-    
+
     Support for pip, uv, and pixi
 
 - :material-code-braces: **Code Quality**
 
     ---
-    
+
     Pre-configured with Ruff and pre-commit hooks
 
 - :material-file-tree: **Flexible Structure**
 
     ---
-    
+
     Choose minimal or full project structure with docs
 
 </div>
@@ -119,19 +119,19 @@ copier copy gh:MoustHolmes/cookiecutter-ml-templates/templates/barebone . --trus
 <div class="grid cards" markdown>
 
 - [:material-rocket-launch: **Quick Start**](getting-started/quickstart.md)
-  
+
     Get your first project running in minutes
 
 - [:material-book-open-page-variant: **Browse Templates**](available-templates/overview.md)
-  
+
     Explore all available templates and choose the right one
 
 - [:material-school: **Read Guides**](guides/hydra-config.md)
-  
+
     Learn about configuration, testing, and best practices
 
 - [:material-github: **Contribute**](development/contributing.md)
-  
+
     Help make these templates even better
 
 </div>

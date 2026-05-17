@@ -5,7 +5,7 @@ repos:
     -   id: check-added-large-files
         args: ['--maxkb=2048']
     -   id: check-yaml
-        exclude: ^templates/.*$
+        exclude: ^(templates/.*|copier\.yml)$
     -   id: check-toml
         exclude: ^templates/.*$
     -   id: check-merge-conflict

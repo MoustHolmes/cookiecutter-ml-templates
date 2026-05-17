@@ -20,10 +20,10 @@ To use this feature, you need:
     ```bash
     # Debian/Ubuntu
     sudo apt install gh
-    
+
     # Fedora/RHEL
     sudo dnf install gh
-    
+
     # Arch
     sudo pacman -S github-cli
     ```
@@ -32,7 +32,7 @@ To use this feature, you need:
     ```powershell
     # Using winget
     winget install GitHub.cli
-    
+
     # Using scoop
     scoop install gh
     ```
@@ -64,12 +64,12 @@ github_username [yourname]: YourGitHubUsername
 
 !!! tip "What Happens"
     When you select "yes":
-    
+
     1. ✅ Git repository is initialized
     2. ✅ Initial commit is created
     3. ✅ GitHub repository is created
     4. ✅ Code is pushed to GitHub
-    
+
     All automatically!
 
 ## What Gets Created
@@ -194,7 +194,7 @@ copier copy gh:MoustHolmes/cookiecutter-ml-templates/templates/barebone . --trus
 
 !!! warning "Private Repositories"
     The default hook creates **public** repositories. For private repos:
-    
+
     ```bash
     # Create repo manually with private flag
     gh repo create username/project-name --private --source=. --push

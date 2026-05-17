@@ -6,16 +6,16 @@ the dep injection via add_deps.py worked.
 """
 
 from pathlib import Path
+from typing import Any
 
 import copier
-import pytest
 
 REPO_ROOT = (Path(__file__).parent / "..").resolve()
 CLASSIFICATION_TEMPLATE = REPO_ROOT / "templates" / "core" / "classification"
 IMAGE_LOGGER_EXTENSION = REPO_ROOT / "templates" / "extensions" / "image_logger"
 
 
-def _generate_cls(dst: Path, **data) -> Path:
+def _generate_cls(dst: Path, **data: Any) -> Path:
     defaults = {
         "project_name": "test_cls",
         "author_name": "Test Author",
@@ -34,7 +34,7 @@ def _generate_cls(dst: Path, **data) -> Path:
     return dst
 
 
-def _apply_image_logger(dst: Path, **data) -> Path:
+def _apply_image_logger(dst: Path, **data: Any) -> Path:
     copier.run_copy(
         src_path=str(IMAGE_LOGGER_EXTENSION),
         dst_path=str(dst),

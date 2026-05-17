@@ -36,15 +36,13 @@ def _load_answers(answers_file: str) -> dict:
 
 def _dep_in_list(name: str, items: list) -> bool:
     """Return True if a dep with the given bare name already exists in a list."""
-    for item in items:
-        if _parse_dep_name(str(item)) == name:
-            return True
-    return False
+    return any(_parse_dep_name(str(item)) == name for item in items)
 
 
 # ── pip ──────────────────────────────────────────────────────────────────────
 
-def _add_pip(dep: str, dev: bool) -> None:
+
+def _add_pip(dep: str, *, dev: bool) -> None:
     name = _parse_dep_name(dep)
     fname = "requirements_dev.txt" if dev else "requirements.txt"
     path = Path(fname)
@@ -62,7 +60,8 @@ def _add_pip(dep: str, dev: bool) -> None:
 
 # ── uv / pip (pyproject.toml) ────────────────────────────────────────────────
 
-def _add_pyproject(dep: str, dev: bool) -> None:
+
+def _add_pyproject(dep: str, *, dev: bool) -> None:
     name = _parse_dep_name(dep)
     path = Path("pyproject.toml")
     if not path.exists():
@@ -94,7 +93,8 @@ def _add_pyproject(dep: str, dev: bool) -> None:
 
 # ── pixi ─────────────────────────────────────────────────────────────────────
 
-def _add_pixi(dep: str, dev: bool) -> None:
+
+def _add_pixi(dep: str, *, dev: bool) -> None:
     name = _parse_dep_name(dep)
     # Try pixi CLI first (handles lock file update automatically)
     try:
@@ -102,7 +102,7 @@ def _add_pixi(dep: str, dev: bool) -> None:
         if dev:
             cmd += ["--feature", "dev"]
         cmd.append(dep)
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        result = subprocess.run(cmd, capture_output=True, text=True, check=False)
         if result.returncode == 0:
             print(f"[add_deps] Added {dep} via pixi add")
             return
@@ -136,6 +136,7 @@ def _add_pixi(dep: str, dev: bool) -> None:
 
 # ── main ─────────────────────────────────────────────────────────────────────
 
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("dep", help="Dependency spec, e.g. 'wandb>=0.16.0'")
@@ -147,11 +148,11 @@ def main() -> None:
     deps_manager = answers.get("deps_manager", "pip")
 
     if deps_manager == "pip":
-        _add_pip(args.dep, args.dev)
+        _add_pip(args.dep, dev=args.dev)
     elif deps_manager == "uv":
-        _add_pyproject(args.dep, args.dev)
+        _add_pyproject(args.dep, dev=args.dev)
     elif deps_manager == "pixi":
-        _add_pixi(args.dep, args.dev)
+        _add_pixi(args.dep, dev=args.dev)
     else:
         sys.exit(f"[add_deps] Unknown deps_manager: {deps_manager!r}")
 
