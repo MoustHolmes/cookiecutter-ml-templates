@@ -6,6 +6,10 @@ build-backend = "hatchling.build"
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 {%- endif %}
+{% if deps_manager in ['uv', 'pixi'] %}
+[tool.hatch.build.targets.wheel]
+packages = ["src/{{repo_name}}"]
+{% endif %}
 
 [project]
 name = "{{repo_name}}"

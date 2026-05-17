@@ -3,6 +3,7 @@
 from {{repo_name}}.modules.schedulers import LinearScheduler, CosineScheduler
 from {{repo_name}}.modules.samplers import GaussianSampler, UniformSampler
 from {{repo_name}}.modules.solvers import EulerSolver, RK4Solver
+from {{repo_name}}.modules.latent_processors import LatentProcessor, AutoencoderWrapper
 
 __all__ = [
     "LinearScheduler",
@@ -11,4 +12,6 @@ __all__ = [
     "UniformSampler",
     "EulerSolver",
     "RK4Solver",
+    "LatentProcessor",
+    "AutoencoderWrapper",
 ]
