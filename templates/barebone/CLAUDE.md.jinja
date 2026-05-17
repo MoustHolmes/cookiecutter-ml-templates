@@ -1,0 +1,49 @@
+# {{project_name}}
+
+Minimal PyTorch Lightning + Hydra scaffold — a blank slate for any supervised ML task.
+
+## Commands
+
+{% if deps_manager == 'pixi' -%}
+```bash
+pixi run train       # launch training
+pixi run test        # run test suite
+pixi run lint        # ruff check
+```
+{%- elif deps_manager == 'uv' -%}
+```bash
+uv run invoke train  # launch training
+uv run invoke test   # run test suite
+uv run ruff check .  # lint
+```
+{%- else -%}
+```bash
+invoke train         # launch training
+invoke test          # run test suite
+ruff check .         # lint
+```
+{%- endif %}
+
+## Architecture
+
+**The boundary that must not cross:**
+- `src/{{repo_name}}/models/` — pure networks: take tensors in, return tensors out. No loss, no optimizer, no Lightning.
+- `src/{{repo_name}}/barebones_lightningmodule.py` — owns everything else: `training_step`, `validation_step`, loss, optimizer, scheduler.
+
+**Hydra config composition:**
+`configs/train_config.yaml` is the single entry point. It composes sub-configs from `configs/model/`, `configs/data/`, `configs/trainer/`, etc. Override any value on the CLI: `python src/{{repo_name}}/train.py trainer.max_epochs=50`.
+
+**Where to start:**
+1. Implement your network in `src/{{repo_name}}/models/` (return raw tensor, no loss)
+2. Wire loss + optimizer in `barebones_lightningmodule.py`
+3. Implement `BarebonesDataModule` in `src/{{repo_name}}/data/barebones_datamodule.py`
+4. Add/edit Hydra config groups under `configs/`
+
+## Key files
+
+| File | Purpose |
+|---|---|
+| `src/{{repo_name}}/barebones_lightningmodule.py` | Training logic — implement this |
+| `src/{{repo_name}}/data/barebones_datamodule.py` | Data loading — implement this |
+| `configs/train_config.yaml` | Root Hydra config; controls everything |
+| `configs/model/default_model.yaml` | Model hyperparameters |

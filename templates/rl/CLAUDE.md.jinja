@@ -1,0 +1,62 @@
+# {{project_name}}
+
+Multi-algorithm RL with PyTorch Lightning + Hydra + Gymnasium. Ships with SAC, TD3, PPO (discrete + continuous), RPO, and DQN.
+
+## Commands
+
+{% if deps_manager == 'pixi' -%}
+```bash
+pixi run train       # launch training (algorithm set in config)
+pixi run test        # run test suite
+pixi run lint        # ruff check
+```
+{%- elif deps_manager == 'uv' -%}
+```bash
+uv run invoke train  # launch training
+uv run invoke test   # run test suite
+uv run ruff check .  # lint
+```
+{%- else -%}
+```bash
+invoke train         # launch training
+invoke test          # run test suite
+ruff check .         # lint
+```
+{%- endif %}
+
+Switch algorithm and environment entirely via config — no code changes:
+```bash
+python src/{{repo_name}}/train.py +experiment=sac_pendulum
+python src/{{repo_name}}/train.py +experiment=ppo_cartpole
+python src/{{repo_name}}/train.py +experiment=dqn_lunar_lander
+```
+
+## Architecture
+
+**Algorithm selection is config-only.** `configs/train_config.yaml` `defaults` list selects the agent config (e.g., `agent: sac`). Each agent config points to its LightningModule via `_target_`.
+
+**Each algorithm module is self-contained** — no shared base class:
+- `sac_module.py` / `td3_module.py` — off-policy actor-critic
+- `ppo_module.py` — on-policy (also handles RPO)
+- `dqn_module.py` — off-policy value-based
+
+**Data pipeline splits by on/off-policy:**
+- `data/replay_buffer.py` + `data/env_datamodule.py` — SAC, TD3, DQN
+- `data/rollout_datamodule.py` — PPO, RPO
+
+**Callbacks are optional but wired in configs:**
+- `callbacks/episode_logger.py` — logs episode reward and length to WandB
+- `callbacks/video_logger.py` — records env renders (disable by removing from config; slow)
+
+**Models are pure networks** — `models/actor.py` and `models/critic.py` return raw tensors. All RL logic (Bellman update, entropy tuning, GAE) lives in the module files.
+
+## Key files
+
+| File | Purpose |
+|---|---|
+| `src/{{repo_name}}/<algo>_module.py` | Algorithm logic — extend the relevant one |
+| `src/{{repo_name}}/data/replay_buffer.py` | Off-policy experience replay |
+| `src/{{repo_name}}/data/rollout_datamodule.py` | On-policy trajectory collection |
+| `configs/experiment/` | Preset configs per algorithm + environment |
+| `configs/agent/` | Per-algorithm hyperparameters |
+| `configs/environment/` | Gymnasium env configs |
