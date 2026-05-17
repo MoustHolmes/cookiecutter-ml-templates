@@ -2,6 +2,7 @@
 
 Covers all 9 cases: 3 managers x {runtime dep, dev dep, already-present dep}.
 """
+
 from __future__ import annotations
 
 import subprocess

@@ -13,7 +13,7 @@ FLOW_MATCHING_TEMPLATE = REPO_ROOT / "templates" / "generative" / "flow_matching
 RL_TEMPLATE = REPO_ROOT / "templates" / "rl"
 
 
-@pytest.fixture()
+@pytest.fixture
 def temp_dir(tmp_path: Path) -> Path:
     return tmp_path
 

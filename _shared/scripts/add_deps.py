@@ -9,6 +9,7 @@ Usage:
     python add_deps.py "wandb>=0.16.0" --dev
     python add_deps.py "wandb>=0.16.0" --answers-file .copier-answers.base.yml
 """
+
 from __future__ import annotations
 
 import argparse
