@@ -14,17 +14,19 @@ update lifecycle are distinct concepts with no Cookiecutter equivalent.
 
 ## Canonical sources
 
-- Reference: https://copier.readthedocs.io/en/stable/
-- `copier.yml` configuration keys: https://copier.readthedocs.io/en/stable/configuring/
-- Generating from a template (`copier copy`): https://copier.readthedocs.io/en/stable/generating/
-- Updating existing projects (`copier update`): https://copier.readthedocs.io/en/stable/updating/
-- Template authoring (Jinja + special vars): https://copier.readthedocs.io/en/stable/creating/
+- Overview: https://copier.readthedocs.io/en/stable/
+- Creating a template: https://copier.readthedocs.io/en/stable/creating/
+- Configureing a template: https://copier.readthedocs.io/en/stable/configuring/
+- Generating a project: https://copier.readthedocs.io/en/stable/generating/
+- Updating a project: https://copier.readthedocs.io/en/stable/updating/
+- Settings: https://copier.readthedocs.io/en/stable/settings/
+- Reference: https://copier.readthedocs.io/en/stable/reference/api/
+- FAQ: https://copier.readthedocs.io/en/stable/faq/
 - Tasks (`_tasks`): https://copier.readthedocs.io/en/stable/configuring/#tasks
 - External data (`_external_data`): https://copier.readthedocs.io/en/stable/configuring/#external-data
 - Template inheritance (`_extends`): https://copier.readthedocs.io/en/stable/configuring/#extending-a-template
 - Subdirectory mode (`_subdirectory`): https://copier.readthedocs.io/en/stable/configuring/#subdirectory
-- Answers file reference: https://copier.readthedocs.io/en/stable/configuring/#answers_file
-- Python API: https://copier.readthedocs.io/en/stable/api/
+
 
 ## How to use
 
