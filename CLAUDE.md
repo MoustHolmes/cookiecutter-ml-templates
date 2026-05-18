@@ -6,27 +6,27 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 Install dev dependencies:
 ```bash
-pip install -r requirements.txt
+uv sync --group dev
 ```
 
 Run all tests (excluding slow integration tests):
 ```bash
-pytest tests/ -m "not slow"
+uv run pytest tests/ -m "not slow"
 ```
 
 Run a single test:
 ```bash
-pytest tests/test_base_generation.py::test_barebone_full_structure
+uv run pytest tests/test_base_generation.py::test_barebone_full_structure
 ```
 
 Run slow integration tests (generate projects, install deps, run their internal tests):
 ```bash
-pytest tests/ -m slow
+uv run pytest tests/ -m slow
 ```
 
 Lint:
 ```bash
-ruff check .
+uv run ruff check .
 ```
 
 ## Architecture
@@ -119,8 +119,8 @@ Follow the `_generate_*` helper pattern. Add: full structure test, deps variants
 ### 4. Run the test suite
 
 ```bash
-pytest tests/test_base_generation.py -k "<new_template>" -m "not slow"
-pytest tests/ -m "not slow"
+uv run pytest tests/test_base_generation.py -k "<new_template>" -m "not slow"
+uv run pytest tests/ -m "not slow"
 ```
 
 ### 5. Transfer to templates/

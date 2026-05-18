@@ -13,7 +13,13 @@ ML projects involve repetitive setup and boilerplate. This library provides clea
 ### 1. Install Copier
 
 ```bash
-pip install copier
+uv tool install copier
+```
+
+Or with pipx:
+
+```bash
+pipx install copier
 ```
 
 ### 2. Set personal defaults (optional)
@@ -110,7 +116,7 @@ cookiecutter-ml-templates/
 │       └── image_logger/   # WandB image logging extension
 ├── tests/                  # Template generation tests (Copier API)
 ├── .github/workflows/      # CI: fast tests on every push, slow tests on main
-└── requirements.txt        # Dev dependencies (copier, pytest, tomlkit, ...)
+└── pyproject.toml          # Dev dependencies (copier, pytest, tomlkit, ...)
 ```
 
 ## Core Principles
@@ -133,7 +139,23 @@ cookiecutter-ml-templates/
 
 ## Contributing
 
-Contributions welcome. See the [Contributing Guidelines](docs/development/contributing.md).
+Contributions welcome. To set up a local development environment:
+
+```bash
+git clone https://github.com/MoustHolmes/cookiecutter-ml-templates
+cd cookiecutter-ml-templates
+uv sync --group dev
+```
+
+Run the test suite (copier is available inside the uv environment — no separate install needed):
+
+```bash
+uv run pytest tests/ -m "not slow"   # fast tests
+uv run pytest tests/ -m slow         # integration tests (generates real projects)
+uv run ruff check .                  # lint
+```
+
+See [Contributing Guidelines](docs/development/contributing.md) for more detail.
 
 ## Acknowledgements
 

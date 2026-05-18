@@ -2,6 +2,29 @@
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "cookiecutter-ml-templates"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = []
+
+[tool.setuptools]
+packages = []
+
+[dependency-groups]
+dev = [
+    "copier>=9.15.0",
+    "tomlkit>=0.12.0",
+    "jinja2-time>=0.2.0",
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-timeout>=2.1.0",
+    "ruff>=0.2.2",
+    "invoke>=2.2.0",
+    "pre-commit>=3.4.0",
+    "ty>=0.0.0a1",
+]
+
 [tool.ruff]
 line-length = 120
 target-version = "py311"
@@ -17,6 +40,13 @@ convention = "google"
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101", "S607", "PLC0415", "PLW1510", "D101", "D102", "ANN101", "ANN401", "S603", "FBT001", "FBT002"]
 "_shared/scripts/add_deps.py" = ["EXE001", "S603"]
+
+[tool.ty.src]
+exclude = [
+    "templates/**",
+    "test_temp/**",
+    "site/**",
+]
 
 [tool.coverage.run]
 include = ["src/*"]

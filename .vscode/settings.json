@@ -1,17 +1,21 @@
 {
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
     "python-envs.pythonProjects": [
         {
-            "path": "",
-            "envManager": "ms-python.python:conda",
-            "packageManager": "ms-python.python:conda"
+            "path": ".",
+            "envManager": "ms-python.python:venv",
+            "packageManager": "ms-python.python:pip"
         }
     ],
+    "python.analysis.typeCheckingMode": "off",
     "python.analysis.exclude": [
-        "**/{{repo_name}}/**",
-        "templates/**"
+        "templates/**",
+        "test_temp/**",
+        "site/**"
     ],
     "python.analysis.ignore": [
-        "**/{{repo_name}}/**",
-        "templates/**"
+        "templates/**",
+        "test_temp/**",
+        "site/**"
     ]
 }
