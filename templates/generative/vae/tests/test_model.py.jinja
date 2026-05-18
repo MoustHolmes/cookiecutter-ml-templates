@@ -1,0 +1,95 @@
+import pytest
+import torch
+from functools import partial
+from torch.optim import Adam
+
+from {{repo_name}}.models.encoder import Encoder
+from {{repo_name}}.models.decoder import Decoder
+from {{repo_name}}.vae_module import VAEModule
+
+{% if dataset == 'cifar10' -%}
+_IN_CHANNELS = 3
+_IMAGE_SIZE = (32, 32)
+{%- else -%}
+_IN_CHANNELS = 1
+_IMAGE_SIZE = (28, 28)
+{%- endif %}
+
+_LATENT_DIM = 16
+
+
+@pytest.fixture
+def encoder():
+    return Encoder(in_channels=_IN_CHANNELS, image_size=_IMAGE_SIZE, latent_dim=_LATENT_DIM)
+
+
+@pytest.fixture
+def decoder():
+    return Decoder(out_channels=_IN_CHANNELS, image_size=_IMAGE_SIZE, latent_dim=_LATENT_DIM)
+
+
+@pytest.fixture
+def vae_module(encoder, decoder):
+    return VAEModule(
+        encoder=encoder,
+        decoder=decoder,
+        optimizer=partial(Adam, lr=1e-3),
+        latent_dim=_LATENT_DIM,
+    )
+
+
+def test_encoder_forward(encoder):
+    """Encoder maps images to (mu, log_var) of shape (B, latent_dim)."""
+    x = torch.randn(4, _IN_CHANNELS, *_IMAGE_SIZE)
+    mu, log_var = encoder(x)
+    assert mu.shape == (4, _LATENT_DIM)
+    assert log_var.shape == (4, _LATENT_DIM)
+    assert not torch.isnan(mu).any()
+    assert not torch.isnan(log_var).any()
+
+
+def test_decoder_forward(decoder):
+    """Decoder maps latent vectors to images of the expected shape."""
+    z = torch.randn(4, _LATENT_DIM)
+    recon = decoder(z)
+    assert recon.shape == (4, _IN_CHANNELS, *_IMAGE_SIZE)
+    assert not torch.isnan(recon).any()
+
+
+def test_vae_module_init(vae_module):
+    """VAEModule initialises with correct hyperparameters."""
+    assert vae_module.hparams.latent_dim == _LATENT_DIM
+    assert vae_module.hparams.beta == 1.0
+    assert vae_module.hparams.kl_warmup_epochs == 0
+
+
+def test_vae_reparameterize(vae_module):
+    """Reparameterize produces a sample with the same shape as mu."""
+    mu = torch.zeros(4, _LATENT_DIM)
+    log_var = torch.zeros(4, _LATENT_DIM)
+    z = vae_module.reparameterize(mu, log_var)
+    assert z.shape == (4, _LATENT_DIM)
+
+
+def test_vae_training_step(vae_module):
+    """Training step returns a scalar loss without NaNs."""
+    x = torch.randn(4, _IN_CHANNELS, *_IMAGE_SIZE)
+    y = torch.zeros(4, dtype=torch.long)
+    loss = vae_module.training_step((x, y), 0)
+    assert isinstance(loss, torch.Tensor)
+    assert loss.shape == ()
+    assert not torch.isnan(loss).any()
+
+
+def test_vae_generate(vae_module):
+    """generate() returns images of the correct shape."""
+    samples = vae_module.generate(num_samples=8)
+    assert samples.shape == (8, _IN_CHANNELS, *_IMAGE_SIZE)
+    assert not torch.isnan(samples).any()
+
+
+def test_configure_optimizers(vae_module):
+    """configure_optimizers returns a dict with an Adam optimizer."""
+    config = vae_module.configure_optimizers()
+    assert isinstance(config["optimizer"], torch.optim.Adam)
+    assert config["optimizer"].defaults["lr"] == 1e-3

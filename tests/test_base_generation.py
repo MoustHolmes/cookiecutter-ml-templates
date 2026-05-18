@@ -1,4 +1,4 @@
-"""Copier-based generation tests for the barebone, classification, and flow_matching templates."""
+"""Copier-based generation tests for the barebone, classification, flow_matching, rl, and vae templates."""
 
 from pathlib import Path
 from typing import Any
@@ -11,6 +11,7 @@ BAREBONE_TEMPLATE = REPO_ROOT / "templates" / "barebone"
 CLASSIFICATION_TEMPLATE = REPO_ROOT / "templates" / "core" / "classification"
 FLOW_MATCHING_TEMPLATE = REPO_ROOT / "templates" / "generative" / "flow_matching"
 RL_TEMPLATE = REPO_ROOT / "templates" / "rl"
+VAE_TEMPLATE = REPO_ROOT / "templates" / "generative" / "vae"
 
 
 @pytest.fixture
@@ -427,3 +428,170 @@ def test_rl_config_uses_repo_name(temp_dir: Path) -> None:
     out = _generate_rl(temp_dir / "naming", project_name="my_rl")
     sac_cfg = (out / "configs" / "agent" / "sac.yaml").read_text()
     assert "my_rl.sac_module" in sac_cfg
+
+
+# --- VAE template ---
+
+
+def _generate_vae(dst: Path, **data: Any) -> Path:
+    defaults = {
+        "project_name": "test_vae",
+        "user_name": "Test Author",
+        "description": "Test Description",
+        "python_version": "3.12",
+        "latent_dim": 32,
+        "dataset": "mnist",
+        "beta_vae": False,
+    }
+    defaults.update(data)
+    copier.run_copy(
+        src_path=str(VAE_TEMPLATE),
+        dst_path=str(dst),
+        data=defaults,
+        defaults=True,
+        overwrite=True,
+        unsafe=True,
+    )
+    return dst
+
+
+def test_vae_full_structure(temp_dir: Path) -> None:
+    out = _generate_vae(temp_dir / "full")
+
+    src = out / "src" / "test_vae"
+    assert src.exists()
+    assert (src / "__init__.py").exists()
+    assert (src / "train.py").exists()
+    assert (src / "vae_module.py").exists()
+    assert (src / "models" / "__init__.py").exists()
+    assert (src / "models" / "encoder.py").exists()
+    assert (src / "models" / "decoder.py").exists()
+    assert (src / "data" / "__init__.py").exists()
+    assert (src / "data" / "datamodule.py").exists()
+    assert (src / "callbacks" / "__init__.py").exists()
+    assert (src / "callbacks" / "vae_image_logger.py").exists()
+
+    assert (out / "configs" / "train_config.yaml").exists()
+    assert (out / "configs" / "paths_config.yaml").exists()
+    assert (out / "configs" / "model" / "default_model.yaml").exists()
+    assert (out / "configs" / "data" / "default_data_module.yaml").exists()
+    assert (out / "configs" / "trainer" / "default_trainer.yaml").exists()
+    assert (out / "configs" / "callbacks" / "default_callbacks.yaml").exists()
+    assert (out / "configs" / "logger" / "wandb_logger.yaml").exists()
+    assert (out / "configs" / "experiment" / "debug.yaml").exists()
+
+    assert (out / "tests" / "__init__.py").exists()
+    assert (out / "tests" / "conftest.py").exists()
+    assert (out / "tests" / "test_config.py").exists()
+    assert (out / "tests" / "test_model.py").exists()
+    assert (out / "tests" / "test_data.py").exists()
+    assert (out / "tests" / "test_train_script.py").exists()
+
+    assert (out / "data" / "MNIST" / "raw" / ".gitkeep").exists()
+    assert (out / ".github" / "workflows" / "ci.yml").exists()
+    assert (out / ".copier-answers.yml").exists()
+    assert (out / "pyproject.toml").exists()
+    assert (out / "README.md").exists()
+
+
+def test_vae_uv_deps_manager(temp_dir: Path) -> None:
+    out = _generate_vae(temp_dir / "uv", deps_manager="uv")
+
+    assert not (out / "requirements.txt").exists()
+    assert not (out / "pixi.toml").exists()
+
+    pyproject = (out / "pyproject.toml").read_text()
+    assert "dependencies = [" in pyproject
+    assert "[project.optional-dependencies]" in pyproject
+
+    tasks = (out / "tasks.py").read_text()
+    assert "uv run" in tasks
+
+
+def test_vae_pip_deps_manager(temp_dir: Path) -> None:
+    out = _generate_vae(temp_dir / "pip", deps_manager="pip")
+
+    assert (out / "requirements.txt").exists()
+    assert (out / "requirements_dev.txt").exists()
+    assert not (out / "pixi.toml").exists()
+
+    tasks = (out / "tasks.py").read_text()
+    assert "uv run" not in tasks
+
+
+def test_vae_pixi_deps_manager(temp_dir: Path) -> None:
+    out = _generate_vae(temp_dir / "pixi", deps_manager="pixi")
+
+    assert (out / "pixi.toml").exists()
+    assert not (out / "requirements.txt").exists()
+    assert not (out / "tasks.py").exists()
+
+
+def test_vae_config_uses_repo_name(temp_dir: Path) -> None:
+    out = _generate_vae(temp_dir / "naming", project_name="my_vae")
+    model_cfg = (out / "configs" / "model" / "default_model.yaml").read_text()
+    assert "my_vae.vae_module.VAEModule" in model_cfg
+    assert "my_vae.models.encoder.Encoder" in model_cfg
+    assert "my_vae.models.decoder.Decoder" in model_cfg
+
+
+def test_vae_dataset_mnist(temp_dir: Path) -> None:
+    out = _generate_vae(temp_dir / "mnist", dataset="mnist")
+    model_cfg = (out / "configs" / "model" / "default_model.yaml").read_text()
+    assert "in_channels: 1" in model_cfg
+    assert "[28, 28]" in model_cfg
+    datamodule = (out / "src" / "test_vae" / "data" / "datamodule.py").read_text()
+    assert "MNIST" in datamodule
+
+
+def test_vae_dataset_cifar10(temp_dir: Path) -> None:
+    out = _generate_vae(temp_dir / "cifar10", dataset="cifar10")
+    model_cfg = (out / "configs" / "model" / "default_model.yaml").read_text()
+    assert "in_channels: 3" in model_cfg
+    assert "[32, 32]" in model_cfg
+    datamodule = (out / "src" / "test_vae" / "data" / "datamodule.py").read_text()
+    assert "CIFAR10" in datamodule
+
+
+def test_vae_dataset_custom(temp_dir: Path) -> None:
+    out = _generate_vae(temp_dir / "custom", dataset="custom")
+    datamodule = (out / "src" / "test_vae" / "data" / "datamodule.py").read_text()
+    assert "TODO" in datamodule
+
+
+def test_vae_beta_vae_false(temp_dir: Path) -> None:
+    out = _generate_vae(temp_dir / "standard", beta_vae=False)
+    model_cfg = (out / "configs" / "model" / "default_model.yaml").read_text()
+    assert "beta: 1.0" in model_cfg
+    assert "kl_warmup_epochs: 0" in model_cfg
+
+
+def test_vae_beta_vae_true(temp_dir: Path) -> None:
+    out = _generate_vae(temp_dir / "betavae", beta_vae=True, beta=4.0)
+    model_cfg = (out / "configs" / "model" / "default_model.yaml").read_text()
+    assert "beta: 4.0" in model_cfg
+    assert "kl_warmup_epochs: 10" in model_cfg
+
+
+def test_vae_latent_dim(temp_dir: Path) -> None:
+    out = _generate_vae(temp_dir / "latent", latent_dim=64)
+    model_cfg = (out / "configs" / "model" / "default_model.yaml").read_text()
+    assert "latent_dim: 64" in model_cfg
+
+
+def test_vae_skip_mnist_data(temp_dir: Path) -> None:
+    out = _generate_vae(temp_dir / "skip")
+
+    fake_data = out / "data" / "MNIST" / "raw" / "train-images-idx3-ubyte"
+    fake_data.write_bytes(b"fake mnist content")
+    original_mtime = fake_data.stat().st_mtime
+
+    copier.run_copy(
+        src_path=str(VAE_TEMPLATE),
+        dst_path=str(out),
+        data={"project_name": "test_vae", "user_name": "Test Author", "description": "Test", "python_version": "3.12"},
+        defaults=True,
+        overwrite=True,
+        unsafe=True,
+    )
+    assert fake_data.stat().st_mtime == original_mtime

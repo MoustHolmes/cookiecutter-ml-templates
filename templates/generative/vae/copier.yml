@@ -1,0 +1,65 @@
+---
+!include ../../../_shared/questions/author.yml
+---
+!include ../../../_shared/questions/deps_manager.yml
+---
+!include ../../../_shared/questions/licensing.yml
+---
+
+pytorch_lightning_version:
+    type: str
+    help: PyTorch Lightning version
+    default: "2.2.0"
+
+latent_dim:
+    type: int
+    help: Flat latent space dimension
+    default: 128
+
+dataset:
+    type: str
+    choices:
+        - mnist
+        - cifar10
+        - custom
+    default: mnist
+    help: Dataset to use for training
+
+beta_vae:
+    type: bool
+    default: false
+    help: Enable β-VAE (β > 1 encourages disentangled representations)
+
+beta:
+    type: float
+    default: 4.0
+    when: "{{ beta_vae }}"
+    help: β weight for KL divergence (only used when beta_vae=true)
+
+_answers_file: .copier-answers.yml
+
+_jinja_extensions:
+    - jinja2_time.TimeExtension
+
+_exclude:
+    - "copier.yml"
+    - "TEMPLATE_SUMMARY.md"
+    - "{% if deps_manager != 'pip' %}requirements.txt{% endif %}"
+    - "{% if deps_manager != 'pixi' %}pixi.toml{% endif %}"
+    - "{% if deps_manager == 'pixi' %}tasks.py{% endif %}"
+    - "{% if open_source_license == 'No license file' %}LICENSE{% endif %}"
+
+_skip_if_exists:
+    - "data/MNIST/**"
+
+_tasks:
+    - command: >-
+          gh repo create {{github_user}}/{{repo_name}}
+          --description "{{description}}" {% if private_repo %}--private{% else %}--public{% endif %} --source . --push
+      when: "{{create_github_repo}}"
+    - command: "rm -rf .claude/skills/uv-docs .claude/skills/pixi-docs"
+      when: "{{deps_manager == 'pip'}}"
+    - command: "rm -rf .claude/skills/conda-docs .claude/skills/pixi-docs"
+      when: "{{deps_manager == 'uv'}}"
+    - command: "rm -rf .claude/skills/conda-docs .claude/skills/uv-docs"
+      when: "{{deps_manager == 'pixi'}}"

@@ -1,0 +1,50 @@
+# {{project_name}}
+
+VAE generative model — ELBO loss, reparameterisation trick, optional β-VAE.
+
+## Commands
+
+{% if deps_manager == 'pixi' -%}
+```bash
+pixi run train       # launch training
+pixi run test        # run test suite
+pixi run lint        # ruff check
+```
+{%- elif deps_manager == 'uv' -%}
+```bash
+uv run invoke train  # launch training
+uv run invoke test   # run test suite
+uv run ruff check .  # lint
+```
+{%- else -%}
+```bash
+invoke train         # launch training
+invoke test          # run test suite
+ruff check .         # lint
+```
+{%- endif %}
+
+Quick sanity check:
+```bash
+python src/{{repo_name}}/train.py +experiment=debug
+```
+
+## Architecture
+
+**Hard boundary — math lives in the module, not the model:**
+- `src/{{repo_name}}/models/encoder.py` — conv + linear projection → (mu, log_var). No loss.
+- `src/{{repo_name}}/models/decoder.py` — linear + conv upsample → reconstructed image. No loss.
+- `src/{{repo_name}}/vae_module.py` — ELBO = MSE recon_loss + β * KL. Reparameterize. Optimizer.
+
+**Key files**
+
+| File | Purpose |
+|---|---|
+| `src/{{repo_name}}/vae_module.py` | ELBO loss, reparameterize, KL annealing, generate() |
+| `src/{{repo_name}}/models/encoder.py` | Encoder weights only |
+| `src/{{repo_name}}/models/decoder.py` | Decoder weights only |
+| `src/{{repo_name}}/data/datamodule.py` | DataModule |
+| `configs/model/default_model.yaml` | Model hyperparameters — edit beta, latent_dim, lr here |
+
+**Config over code:** latent_dim={{latent_dim}}, beta={% if beta_vae %}{{beta}}{% else %}1.0{% endif %}.
+Swap architectures by changing `_target_` in `configs/model/default_model.yaml`.

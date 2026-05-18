@@ -1,0 +1,109 @@
+from pathlib import Path
+
+import pytest
+import torch
+from torch.utils.data import DataLoader
+
+from {{repo_name}}.data.datamodule import DataModule
+
+
+@pytest.fixture
+def data_dir(tmp_path):
+    return str(tmp_path / "data")
+
+
+{% if dataset == 'mnist' %}
+@pytest.fixture
+def datamodule(data_dir):
+    return DataModule(data_dir=data_dir, batch_size=32, num_workers=0)
+
+
+def test_datamodule_prepare_data(datamodule):
+    """prepare_data downloads the MNIST dataset."""
+    datamodule.prepare_data()
+    assert (Path(datamodule.data_dir) / "MNIST").exists()
+
+
+def test_datamodule_setup(datamodule):
+    """setup creates correct train/val splits."""
+    datamodule.prepare_data()
+    datamodule.setup(stage="fit")
+    assert datamodule.train_split is not None
+    assert datamodule.val_split is not None
+    assert len(datamodule.train_split) == 55000
+    assert len(datamodule.val_split) == 5000
+
+    datamodule.setup(stage="test")
+    assert datamodule.test_split is not None
+    assert len(datamodule.test_split) == 10000
+
+
+def test_datamodule_train_dataloader(datamodule):
+    """train_dataloader returns (image, label) batches with correct shapes."""
+    datamodule.prepare_data()
+    datamodule.setup(stage="fit")
+    loader = datamodule.train_dataloader()
+    assert isinstance(loader, DataLoader)
+    batch = next(iter(loader))
+    assert len(batch) == 2
+    assert batch[0].shape[1:] == (1, 28, 28)
+    assert batch[1].shape[0] == datamodule.batch_size
+
+
+def test_datamodule_test_dataloader(datamodule):
+    """test_dataloader returns (image, label) batches with correct shapes."""
+    datamodule.prepare_data()
+    datamodule.setup(stage="test")
+    loader = datamodule.test_dataloader()
+    assert isinstance(loader, DataLoader)
+    batch = next(iter(loader))
+    assert batch[0].shape[1:] == (1, 28, 28)
+
+{% elif dataset == 'cifar10' %}
+@pytest.fixture
+def datamodule(data_dir):
+    return DataModule(data_dir=data_dir, batch_size=32, num_workers=0)
+
+
+def test_datamodule_prepare_data(datamodule):
+    """prepare_data downloads the CIFAR-10 dataset."""
+    datamodule.prepare_data()
+    assert (Path(datamodule.data_dir) / "cifar-10-batches-py").exists()
+
+
+def test_datamodule_setup(datamodule):
+    """setup creates correct train/val splits."""
+    datamodule.prepare_data()
+    datamodule.setup(stage="fit")
+    assert datamodule.train_split is not None
+    assert datamodule.val_split is not None
+    assert len(datamodule.train_split) == 45000
+    assert len(datamodule.val_split) == 5000
+
+    datamodule.setup(stage="test")
+    assert datamodule.test_split is not None
+    assert len(datamodule.test_split) == 10000
+
+
+def test_datamodule_train_dataloader(datamodule):
+    """train_dataloader returns (image, label) batches with correct shapes."""
+    datamodule.prepare_data()
+    datamodule.setup(stage="fit")
+    loader = datamodule.train_dataloader()
+    assert isinstance(loader, DataLoader)
+    batch = next(iter(loader))
+    assert len(batch) == 2
+    assert batch[0].shape[1:] == (3, 32, 32)
+    assert batch[1].shape[0] == datamodule.batch_size
+
+{% else %}
+def test_datamodule_attributes():
+    """Custom DataModule has the expected interface."""
+    dm = DataModule(batch_size=32, num_workers=0)
+    assert dm.hparams.batch_size == 32
+    assert dm.hparams.num_workers == 0
+    assert hasattr(dm, "prepare_data")
+    assert hasattr(dm, "setup")
+    assert hasattr(dm, "train_dataloader")
+
+{% endif %}

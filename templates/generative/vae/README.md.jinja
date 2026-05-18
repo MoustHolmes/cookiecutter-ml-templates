@@ -1,0 +1,142 @@
+# {{project_name}}
+
+{{description}}
+
+## Overview
+
+A minimal, production-ready PyTorch Lightning template for training **Variational Autoencoders**. Features include:
+
+- **VAE with β-VAE support**: Standard ELBO loss with optional KL annealing for disentangled representations
+- **Hydra Configuration**: Clean, composable configs for reproducible experiments
+- **Multiple datasets**: {% if dataset == 'mnist' %}MNIST (28×28 grayscale){% elif dataset == 'cifar10' %}CIFAR-10 (32×32 RGB){% else %}custom dataset stub{% endif %} out of the box
+- **Experiment Tracking**: Built-in Weights & Biases integration
+- **Production Ready**: Type hints, comprehensive tests, and pre-commit hooks
+
+## Getting Started
+
+### Installation
+
+{% if deps_manager == "pixi" %}
+1. Install dependencies:
+```bash
+pixi install
+```
+
+2. Initialize pre-commit hooks:
+```bash
+pixi run pre-commit install
+```
+{% elif deps_manager == "uv" %}
+1. Create virtual environment and install dependencies:
+```bash
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+uv pip install -e ".[dev]"
+```
+
+2. Initialize pre-commit hooks:
+```bash
+pre-commit install
+```
+{% else %}
+1. Create and activate a conda environment:
+```bash
+conda create -n {{repo_name}} python={{python_version}}
+conda activate {{repo_name}}
+```
+
+2. Install the package:
+```bash
+pip install -e ".[dev]"
+```
+
+3. Initialize pre-commit hooks:
+```bash
+pre-commit install
+```
+{% endif %}
+
+### Training
+
+Train with default config:
+```bash
+python src/{{repo_name}}/train.py
+```
+
+Quick sanity check (1 batch):
+```bash
+python src/{{repo_name}}/train.py experiment=debug
+```
+
+Override any config parameter:
+```bash
+python src/{{repo_name}}/train.py \
+    data.batch_size=64 \
+    model.optimizer.lr=0.0001 \
+    trainer.max_epochs=50
+```
+
+## Project Structure
+
+```
+├── configs/                    # Hydra configuration files
+│   ├── train_config.yaml      # Main training config
+│   ├── paths_config.yaml      # Path configurations
+│   ├── data/                  # Data module configs
+│   ├── model/                 # Model configs
+│   ├── trainer/               # PyTorch Lightning trainer configs
+│   ├── callbacks/             # Callback configs
+│   ├── logger/                # Logger configs
+│   └── experiment/            # Full experiment configs (debug, etc.)
+├── src/{{repo_name}}/
+│   ├── train.py               # Main training script
+│   ├── vae_module.py          # VAEModule — ELBO loss, reparameterize, generate
+│   ├── models/
+│   │   ├── encoder.py         # Convolutional encoder → (mu, log_var)
+│   │   └── decoder.py         # Convolutional decoder → reconstructed image
+│   └── data/
+│       └── datamodule.py      # DataModule
+├── tests/                     # Unit tests
+└── data/                      # Data directory
+```
+
+## Architecture
+
+**Model/training separation:**
+- `models/encoder.py` — conv layers + linear projection to (mu, log_var). Weights only.
+- `models/decoder.py` — linear projection + conv upsample to reconstruction. Weights only.
+- `vae_module.py` — ELBO loss, reparameterization trick, KL annealing, optimizer. No weights.
+
+**All components are injected via Hydra** — swap encoder/decoder architectures without touching Python code.
+
+## Configuration
+
+```yaml
+# configs/model/default_model.yaml
+_target_: {{repo_name}}.vae_module.VAEModule
+latent_dim: {{latent_dim}}
+beta: {% if beta_vae %}{{beta}}{% else %}1.0{% endif %}
+kl_warmup_epochs: {% if beta_vae %}10{% else %}0{% endif %}
+
+encoder:
+  _target_: {{repo_name}}.models.encoder.Encoder
+  in_channels: {% if dataset == 'cifar10' %}3{% else %}1{% endif %}
+  image_size: {% if dataset == 'cifar10' %}[32, 32]{% else %}[28, 28]{% endif %}
+  latent_dim: {{latent_dim}}
+
+decoder:
+  _target_: {{repo_name}}.models.decoder.Decoder
+  # ... mirror of encoder
+```
+
+## License
+
+{% if open_source_license != "No license file" -%}
+{{open_source_license}} License — see LICENSE file for details.
+{%- else -%}
+This project is not licensed for public use.
+{%- endif %}
+
+## Author
+
+{{user_name}}
