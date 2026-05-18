@@ -11,31 +11,6 @@ pytorch_lightning_version:
     help: PyTorch Lightning version
     default: "2.2.0"
 
-latent_dim:
-    type: int
-    help: Flat latent space dimension
-    default: 128
-
-dataset:
-    type: str
-    choices:
-        - mnist
-        - cifar10
-        - custom
-    default: mnist
-    help: Dataset to use for training
-
-beta_vae:
-    type: bool
-    default: false
-    help: Enable β-VAE (β > 1 encourages disentangled representations)
-
-beta:
-    type: float
-    default: 4.0
-    when: "{{ beta_vae }}"
-    help: β weight for KL divergence (only used when beta_vae=true)
-
 _answers_file: .copier-answers.yml
 
 _jinja_extensions:

@@ -7,14 +7,8 @@ from {{repo_name}}.models.encoder import Encoder
 from {{repo_name}}.models.decoder import Decoder
 from {{repo_name}}.vae_module import VAEModule
 
-{% if dataset == 'cifar10' -%}
-_IN_CHANNELS = 3
-_IMAGE_SIZE = (32, 32)
-{%- else -%}
 _IN_CHANNELS = 1
 _IMAGE_SIZE = (28, 28)
-{%- endif %}
-
 _LATENT_DIM = 16
 
 

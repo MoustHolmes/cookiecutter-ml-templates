@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Optional
+
 import torch
 import torch.nn as nn
 
@@ -17,6 +19,9 @@ class Decoder(nn.Module):
         image_size: (height, width) of the target output — must match encoder.
         latent_dim: Dimension of the latent vector z.
         hidden_channels: Width of the convolutional feature maps.
+        output_activation: Optional activation applied to the final output.
+            Use nn.Sigmoid for [0, 1] pixel data, nn.Tanh for [-1, 1].
+            None means no activation (unbounded output).
     """
 
     def __init__(
@@ -25,6 +30,7 @@ class Decoder(nn.Module):
         image_size: tuple[int, int],
         latent_dim: int,
         hidden_channels: int = 64,
+        output_activation: Optional[nn.Module] = None,
     ) -> None:
         super().__init__()
         self.h = image_size[0] // 4
@@ -41,8 +47,12 @@ class Decoder(nn.Module):
             nn.Upsample(scale_factor=2, mode="nearest"),
             nn.Conv2d(32, out_channels, kernel_size=3, padding=1),
         )
+        self.output_activation = output_activation
 
     def forward(self, z: torch.Tensor) -> torch.Tensor:
         """Return reconstructed image of shape (B, out_channels, H, W)."""
         x = self.fc(z).view(z.shape[0], self.hidden_channels, self.h, self.w)
-        return self.deconv(x)
+        x = self.deconv(x)
+        if self.output_activation is not None:
+            x = self.output_activation(x)
+        return x

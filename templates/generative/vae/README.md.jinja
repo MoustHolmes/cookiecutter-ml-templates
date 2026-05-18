@@ -8,7 +8,7 @@ A minimal, production-ready PyTorch Lightning template for training **Variationa
 
 - **VAE with β-VAE support**: Standard ELBO loss with optional KL annealing for disentangled representations
 - **Hydra Configuration**: Clean, composable configs for reproducible experiments
-- **Multiple datasets**: {% if dataset == 'mnist' %}MNIST (28×28 grayscale){% elif dataset == 'cifar10' %}CIFAR-10 (32×32 RGB){% else %}custom dataset stub{% endif %} out of the box
+- **MNIST out of the box**: 28×28 grayscale, swap dataset/architecture via Hydra config
 - **Experiment Tracking**: Built-in Weights & Biases integration
 - **Production Ready**: Type hints, comprehensive tests, and pre-commit hooks
 
@@ -114,19 +114,23 @@ python src/{{repo_name}}/train.py \
 ```yaml
 # configs/model/default_model.yaml
 _target_: {{repo_name}}.vae_module.VAEModule
-latent_dim: {{latent_dim}}
-beta: {% if beta_vae %}{{beta}}{% else %}1.0{% endif %}
-kl_warmup_epochs: {% if beta_vae %}10{% else %}0{% endif %}
+latent_dim: 128
+beta: 1.0          # >1 for β-VAE disentanglement
+kl_warmup_epochs: 0
 
 encoder:
   _target_: {{repo_name}}.models.encoder.Encoder
-  in_channels: {% if dataset == 'cifar10' %}3{% else %}1{% endif %}
-  image_size: {% if dataset == 'cifar10' %}[32, 32]{% else %}[28, 28]{% endif %}
-  latent_dim: {{latent_dim}}
+  in_channels: 1
+  image_size: [28, 28]
+  latent_dim: 128
 
 decoder:
   _target_: {{repo_name}}.models.decoder.Decoder
-  # ... mirror of encoder
+  out_channels: 1
+  image_size: [28, 28]
+  latent_dim: 128
+  output_activation:
+    _target_: torch.nn.Sigmoid   # swap for Tanh, Identity, etc.
 ```
 
 ## License

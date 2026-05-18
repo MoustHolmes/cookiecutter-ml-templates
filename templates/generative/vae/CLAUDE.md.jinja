@@ -46,5 +46,5 @@ python src/{{repo_name}}/train.py +experiment=debug
 | `src/{{repo_name}}/data/datamodule.py` | DataModule |
 | `configs/model/default_model.yaml` | Model hyperparameters — edit beta, latent_dim, lr here |
 
-**Config over code:** latent_dim={{latent_dim}}, beta={% if beta_vae %}{{beta}}{% else %}1.0{% endif %}.
-Swap architectures by changing `_target_` in `configs/model/default_model.yaml`.
+**Config over code:** tune `latent_dim`, `beta`, `output_activation`, `lr` in `configs/model/default_model.yaml` without touching Python.
+Swap encoder/decoder architectures by changing `_target_`.

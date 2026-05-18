@@ -1,28 +1,25 @@
 _target_: {{repo_name}}.vae_module.VAEModule
 
-latent_dim: {{latent_dim}}
+latent_dim: 128
 
 encoder:
   _target_: {{repo_name}}.models.encoder.Encoder
-  in_channels: {% if dataset == 'cifar10' %}3{% else %}1{% endif %}
-
-  image_size: {% if dataset == 'cifar10' %}[32, 32]{% else %}[28, 28]{% endif %}
-
-  latent_dim: {{latent_dim}}
+  in_channels: 1
+  image_size: [28, 28]
+  latent_dim: 128
 
 decoder:
   _target_: {{repo_name}}.models.decoder.Decoder
-  out_channels: {% if dataset == 'cifar10' %}3{% else %}1{% endif %}
-
-  image_size: {% if dataset == 'cifar10' %}[32, 32]{% else %}[28, 28]{% endif %}
-
-  latent_dim: {{latent_dim}}
+  out_channels: 1
+  image_size: [28, 28]
+  latent_dim: 128
+  output_activation:
+    _target_: torch.nn.Sigmoid
 
 optimizer:
   _target_: torch.optim.Adam
   _partial_: true
   lr: 1.0e-3
 
-beta: {% if beta_vae %}{{beta}}{% else %}1.0{% endif %}
-
-kl_warmup_epochs: {% if beta_vae %}10{% else %}0{% endif %}
+beta: 1.0
+kl_warmup_epochs: 0
