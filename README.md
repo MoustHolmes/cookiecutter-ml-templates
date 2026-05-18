@@ -16,7 +16,23 @@ ML projects involve repetitive setup and boilerplate. This library provides clea
 pip install copier
 ```
 
-### 2. Generate a project
+### 2. Set personal defaults (optional)
+
+Copier reads `settings.yml` before asking questions, so you can pre-fill your name, email, and GitHub username once instead of typing them every time.
+
+**macOS:** `~/Library/Application Support/copier/settings.yml`
+**Linux:** `~/.config/copier/settings.yml`
+
+```yaml
+defaults:
+    user_name: Your Name
+    user_email: you@example.com
+    github_user: your-github-username
+```
+
+Any template that uses these question names will pick up your values automatically.
+
+### 3. Generate a project
 
 ```bash
 mkdir my_project && cd my_project
@@ -43,7 +59,7 @@ Each template asks for `deps_manager` — choose **pixi**, **uv**, or **pip**:
 | `uv` | `pyproject.toml` inline deps + `tasks.py` using `uv run` |
 | `pip` | `requirements.txt` + `tasks.py` using standard pip |
 
-### 3. Apply an extension (optional)
+### 4. Apply an extension (optional)
 
 Extensions add features without modifying your base files. Apply from inside your project:
 
@@ -51,7 +67,7 @@ Extensions add features without modifying your base files. Apply from inside you
 copier copy gh:MoustHolmes/cookiecutter-ml-templates/templates/extensions/image_logger . --trust
 ```
 
-### 4. Pull template updates
+### 5. Pull template updates
 
 When the upstream template improves, update your project:
 

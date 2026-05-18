@@ -21,7 +21,7 @@ def temp_dir(tmp_path: Path) -> Path:
 def _generate(dst: Path, **data: Any) -> Path:
     defaults = {
         "project_name": "test_project",
-        "author_name": "Test Author",
+        "user_name": "Test Author",
         "description": "Test Description",
         "python_version": "3.12",
     }
@@ -155,7 +155,7 @@ def test_barebone_answers_file_written(temp_dir: Path) -> None:
 def _generate_cls(dst: Path, **data: Any) -> Path:
     defaults = {
         "project_name": "test_cls",
-        "author_name": "Test Author",
+        "user_name": "Test Author",
         "description": "Test Description",
         "python_version": "3.12",
     }
@@ -228,7 +228,7 @@ def test_classification_config_uses_repo_name(temp_dir: Path) -> None:
 def _generate_flow(dst: Path, **data: Any) -> Path:
     defaults = {
         "project_name": "test_flow",
-        "author_name": "Test Author",
+        "user_name": "Test Author",
         "description": "Test Description",
         "python_version": "3.12",
     }
@@ -327,7 +327,7 @@ def test_flow_matching_skip_mnist_data(temp_dir: Path) -> None:
     copier.run_copy(
         src_path=str(FLOW_MATCHING_TEMPLATE),
         dst_path=str(out),
-        data={"project_name": "my_flow", "author_name": "Test Author", "description": "Test", "python_version": "3.12"},
+        data={"project_name": "my_flow", "user_name": "Test Author", "description": "Test", "python_version": "3.12"},
         defaults=True,
         overwrite=True,
         unsafe=True,
@@ -341,7 +341,7 @@ def test_flow_matching_skip_mnist_data(temp_dir: Path) -> None:
 def _generate_rl(dst: Path, **data: Any) -> Path:
     defaults = {
         "project_name": "test_rl",
-        "author_name": "Test Author",
+        "user_name": "Test Author",
         "description": "Test Description",
         "python_version": "3.11",
     }

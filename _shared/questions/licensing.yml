@@ -8,3 +8,9 @@ create_github_repo:
     type: bool
     help: Create a GitHub repository after generation?
     default: false
+
+private_repo:
+    type: bool
+    help: Make the GitHub repository private?
+    default: false
+    when: "{{ create_github_repo }}"

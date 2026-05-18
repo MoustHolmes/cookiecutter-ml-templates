@@ -17,20 +17,20 @@ repo_name:
     default: "{{ project_name | lower | replace(' ', '_') | replace('-', '_') }}"
     when: false
 
-author_name:
+user_name:
     type: str
     help: Your name
     default: Your Name
 
-author_email:
+user_email:
     type: str
     help: Your email
     default: your@email.com
 
-github_username:
+github_user:
     type: str
     help: GitHub username
-    default: "{{ author_name | lower | replace(' ', '') }}"
+    default: "{{ user_name | lower | replace(' ', '') }}"
 
 description:
     type: str

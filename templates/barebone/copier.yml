@@ -28,8 +28,8 @@ _exclude:
 
 _tasks:
     - command: >-
-          gh repo create {{github_username}}/{{repo_name}}
-          --description "{{description}}" --public --source . --push
+          gh repo create {{github_user}}/{{repo_name}}
+          --description "{{description}}" {% if private_repo %}--private{% else %}--public{% endif %} --source . --push
       when: "{{create_github_repo}}"
     - command: "rm -rf .claude/skills/uv-docs .claude/skills/pixi-docs"
       when: "{{deps_manager == 'pip'}}"

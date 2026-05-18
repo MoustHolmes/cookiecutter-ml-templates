@@ -18,7 +18,7 @@ IMAGE_LOGGER_EXTENSION = REPO_ROOT / "templates" / "extensions" / "image_logger"
 def _generate_cls(dst: Path, **data: Any) -> Path:
     defaults = {
         "project_name": "test_cls",
-        "author_name": "Test Author",
+        "user_name": "Test Author",
         "description": "Test Description",
         "python_version": "3.12",
     }
