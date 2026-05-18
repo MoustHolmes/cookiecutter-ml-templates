@@ -439,9 +439,6 @@ def _generate_vae(dst: Path, **data: Any) -> Path:
         "user_name": "Test Author",
         "description": "Test Description",
         "python_version": "3.12",
-        "latent_dim": 32,
-        "dataset": "mnist",
-        "beta_vae": False,
     }
     defaults.update(data)
     copier.run_copy(
@@ -535,8 +532,8 @@ def test_vae_config_uses_repo_name(temp_dir: Path) -> None:
     assert "my_vae.models.decoder.Decoder" in model_cfg
 
 
-def test_vae_dataset_mnist(temp_dir: Path) -> None:
-    out = _generate_vae(temp_dir / "mnist", dataset="mnist")
+def test_vae_mnist_defaults(temp_dir: Path) -> None:
+    out = _generate_vae(temp_dir / "mnist")
     model_cfg = (out / "configs" / "model" / "default_model.yaml").read_text()
     assert "in_channels: 1" in model_cfg
     assert "[28, 28]" in model_cfg
@@ -544,39 +541,12 @@ def test_vae_dataset_mnist(temp_dir: Path) -> None:
     assert "MNIST" in datamodule
 
 
-def test_vae_dataset_cifar10(temp_dir: Path) -> None:
-    out = _generate_vae(temp_dir / "cifar10", dataset="cifar10")
-    model_cfg = (out / "configs" / "model" / "default_model.yaml").read_text()
-    assert "in_channels: 3" in model_cfg
-    assert "[32, 32]" in model_cfg
-    datamodule = (out / "src" / "test_vae" / "data" / "datamodule.py").read_text()
-    assert "CIFAR10" in datamodule
-
-
-def test_vae_dataset_custom(temp_dir: Path) -> None:
-    out = _generate_vae(temp_dir / "custom", dataset="custom")
-    datamodule = (out / "src" / "test_vae" / "data" / "datamodule.py").read_text()
-    assert "TODO" in datamodule
-
-
-def test_vae_beta_vae_false(temp_dir: Path) -> None:
-    out = _generate_vae(temp_dir / "standard", beta_vae=False)
+def test_vae_default_model_config(temp_dir: Path) -> None:
+    out = _generate_vae(temp_dir / "defaults")
     model_cfg = (out / "configs" / "model" / "default_model.yaml").read_text()
     assert "beta: 1.0" in model_cfg
     assert "kl_warmup_epochs: 0" in model_cfg
-
-
-def test_vae_beta_vae_true(temp_dir: Path) -> None:
-    out = _generate_vae(temp_dir / "betavae", beta_vae=True, beta=4.0)
-    model_cfg = (out / "configs" / "model" / "default_model.yaml").read_text()
-    assert "beta: 4.0" in model_cfg
-    assert "kl_warmup_epochs: 10" in model_cfg
-
-
-def test_vae_latent_dim(temp_dir: Path) -> None:
-    out = _generate_vae(temp_dir / "latent", latent_dim=64)
-    model_cfg = (out / "configs" / "model" / "default_model.yaml").read_text()
-    assert "latent_dim: 64" in model_cfg
+    assert "torch.nn.Sigmoid" in model_cfg
 
 
 def test_vae_skip_mnist_data(temp_dir: Path) -> None:
